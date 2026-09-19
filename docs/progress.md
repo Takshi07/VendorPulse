@@ -63,3 +63,41 @@ Part 2 - Create Mongoose models, indexes, enums and domain helpers.
 ### Next
 
 Part 3 — Authentication and role-based authorization.
+
+## Part 3 — Authentication and Authorization
+
+### Completed
+
+- Added JWT session creation and verification using HS256.
+- Configured 8-hour authenticated sessions.
+- Added HttpOnly `vp_session` cookie authentication.
+- Added authentication middleware that verifies the JWT and loads the current user from MongoDB.
+- Added active-user validation for protected requests.
+- Added login, current-user (`/me`), and logout controllers.
+- Added `/api/auth` routes.
+- Created the initial VendorPulse Admin account with a bcrypt-hashed password.
+- Added reusable role-based authorization middleware.
+
+### Verified
+
+- JWT creation and verification work correctly.
+- Unauthenticated `/api/auth/me` returns 401.
+- Valid Admin login returns 200 and sets the session cookie.
+- Authenticated `/api/auth/me` returns the current user.
+- Logout clears the session cookie.
+- `/api/auth/me` returns 401 after logout.
+- ADMIN is accepted on Admin-only routes.
+- PROCUREMENT_MANAGER and VIEWER are rejected from Admin-only routes with 403.
+- ADMIN and PROCUREMENT_MANAGER are accepted on Manager/Admin routes.
+- VIEWER is rejected from Manager/Admin routes with 403.
+
+### End-to-End Authentication Test
+
+- Login → 200
+- `/me` → 200
+- Logout → 200
+- `/me` after logout → 401
+
+### Next
+
+Part 4 — Supplier management API.
