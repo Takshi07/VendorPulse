@@ -2,6 +2,7 @@ import express from "express";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
+import supplierRoutes from "./routes/supplierRoutes.js";
 
 import { errorHandler } from "./middleware/errorHandler.js";
 
@@ -12,6 +13,7 @@ app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/suppliers", supplierRoutes);
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({

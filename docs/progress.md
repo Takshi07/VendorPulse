@@ -101,3 +101,35 @@ Part 3 — Authentication and role-based authorization.
 ### Next
 
 Part 4 — Supplier management API.
+
+## Part 4 — Supplier Management API
+
+### Completed
+
+- Added Supplier service layer.
+- Added supplier creation with server-controlled `createdBy` and ACTIVE status.
+- Added paginated supplier listing.
+- Added supplier search across name, contact person, email and tax ID.
+- Added status and category filtering.
+- Added supplier lookup by ID.
+- Added partial supplier updates with an explicit editable-field allowlist.
+- Added supplier archiving without deleting historical records.
+- Added Supplier controllers and protected routes.
+- Added role-based Supplier permissions.
+
+### Verified
+
+- Unauthenticated Supplier access returns 401.
+- Admin can create a Supplier and receives 201.
+- Supplier list returns stored suppliers with pagination metadata.
+- Search returns matching suppliers and an empty result for missing values.
+- ACTIVE and ARCHIVED filters work correctly.
+- Valid Supplier ID returns 200.
+- Malformed Supplier ID returns 400.
+- Partial Supplier update returns 200 and preserves unchanged fields.
+- Archive operation changes ACTIVE to ARCHIVED.
+- Archived Supplier remains stored and appears under the ARCHIVED filter.
+
+### Next
+
+Part 5 — KPI Management API.
