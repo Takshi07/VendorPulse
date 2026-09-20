@@ -3,18 +3,35 @@ export function errorHandler(err, req, res, next) {
 
   // MongoDB duplicate-key error
   if (err?.code === 11000) {
-    const field = Object.keys(err.keyPattern || {})[0];
+  const fields = Object.keys(err.keyPattern || {});
 
-    const messages = {
-      name: "A KPI with this name already exists",
-      email: "A user with this email already exists",
-      taxId: "A supplier with this tax ID already exists",
-    };
-
+  // Evaluation unique constraint:
+  // supplierId + year + quarter
+  if (
+    fields.includes("supplierId") &&
+    fields.includes("year") &&
+    fields.includes("quarter")
+  ) {
     return res.status(409).json({
-      message: messages[field] || "A record with this value already exists",
+      message:
+        "An evaluation already exists for this supplier and quarter",
     });
   }
+
+  const field = fields[0];
+
+  const messages = {
+    name: "A KPI with this name already exists",
+    email: "A user with this email already exists",
+    taxId: "A supplier with this tax ID already exists",
+  };
+
+  return res.status(409).json({
+    message:
+      messages[field] ||
+      "A record with this value already exists",
+  });
+}
 
   // Mongoose validation errors
   if (err?.name === "ValidationError") {
@@ -34,9 +51,13 @@ export function errorHandler(err, req, res, next) {
 
   // Errors intentionally created by our services
   if (err.status) {
-    return res.status(err.status).json({
+    const response = {
       message: err.message,
-    });
+    };
+    if (err.code) {
+      response.code = err.code;
+    }
+    return res.status(err.status).json(response);
   }
 
   // Unexpected errors must not expose internal details

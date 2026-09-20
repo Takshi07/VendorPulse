@@ -164,3 +164,46 @@ Part 5 — KPI Management API.
 ### Next
 
 Part 6 — Evaluation Configuration and Submission API.
+
+## Part 6 — Evaluation Configuration and Submission API
+
+### Completed
+
+- Added evaluation configuration service and endpoint.
+- Added ACTIVE supplier and ACTIVE KPI loading for evaluation entry.
+- Added active KPI weight validation before submission.
+- Added server-generated criteria signatures.
+- Added evaluation submission for Admin and Procurement Manager roles.
+- Added ACTIVE supplier validation.
+- Added stale-criteria protection using `CRITERIA_CHANGED`.
+- Added exact active-KPI score-set validation.
+- Added duplicate KPI score prevention.
+- Added score range and comment-length validation.
+- Added server-controlled KPI name and weight snapshots.
+- Added server-side weighted overall score calculation.
+- Added server-side performance rating and risk calculation.
+- Added immutable Evaluation creation.
+- Added database-level duplicate supplier/year/quarter protection.
+- Added evaluation listing with pagination and filters.
+- Added individual evaluation result retrieval.
+- Added populated Supplier and evaluator information.
+- Added specific duplicate-evaluation and criteria-change error responses.
+
+### Verified
+
+- Unauthenticated evaluation submission returns 401.
+- Evaluation configuration returns the current active KPI configuration.
+- Active KPI total is 100% and criteria signature is generated.
+- Archived suppliers cannot be evaluated.
+- Valid evaluation submission returns 201.
+- Test evaluation produced overall score 4.2, EXCELLENT rating, and LOW risk.
+- Stored KPI snapshots contain the accepted KPI names and weights.
+- Duplicate supplier/year/quarter submission returns 409.
+- Stale criteria signature returns 409 with `CRITERIA_CHANGED`.
+- Evaluation list and period filtering work.
+- Individual evaluation retrieval works.
+- Invalid evaluation ID returns 400.
+
+### Next
+
+Part 7 — User Management API.
