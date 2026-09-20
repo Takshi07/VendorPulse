@@ -133,3 +133,34 @@ Part 4 — Supplier management API.
 ### Next
 
 Part 5 — KPI Management API.
+
+## Part 5 — KPI Management API
+
+### Completed
+
+- Added KPI service, controller, and Admin-only routes.
+- Added KPI creation, listing, lookup, editing, and ACTIVE/INACTIVE status management.
+- Added coordinated KPI weight adjustment.
+- Added validation requiring confirmed active KPI weights to total exactly 100%.
+- Added duplicate KPI ID and invalid ObjectId validation for weight updates.
+- Hardened the central error handler for MongoDB duplicate-key, Mongoose validation, and cast errors.
+- Prevented unexpected internal server/database messages from being exposed to API clients.
+
+### Verified
+
+- Unauthenticated KPI access returns 401.
+- Admin can create KPIs and receives 201.
+- Created Quality, Delivery, and Cost KPIs.
+- KPI listing and ACTIVE/INACTIVE filtering work.
+- Invalid KPI weight returns 400.
+- Invalid KPI ID returns 400.
+- A 90% coordinated weight update returns 400 and leaves stored weights unchanged.
+- A valid 100% coordinated weight update succeeds.
+- KPI editing returns 200.
+- KPI ACTIVE/INACTIVE changes and filters work correctly.
+- Duplicate KPI name returns 409 instead of exposing MongoDB E11000 details.
+- Current active configuration is Quality 45%, Delivery 30%, Cost 25% = 100%.
+
+### Next
+
+Part 6 — Evaluation Configuration and Submission API.
