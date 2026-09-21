@@ -207,3 +207,31 @@ Part 6 — Evaluation Configuration and Submission API.
 ### Next
 
 Part 7 — User Management API.
+
+## Part 7 — User Management API
+
+### Completed
+
+- Added Admin-only user management API.
+- Added user listing with pagination, search, role and status filters.
+- Added Admin-created users with bcrypt password hashing.
+- Added Procurement Manager and Viewer account creation.
+- Added user name, role and status updates.
+- Prevented passwordHash from being exposed through API responses.
+- Added safeguards preventing existing Admin accounts from being demoted or deactivated.
+- Added invalid and missing user handling.
+
+### Verified
+
+- Procurement Manager creation returns 201.
+- Viewer creation returns 201.
+- User listing returns all users without passwordHash.
+- Non-admin user editing works.
+- Non-admin user deactivation works.
+- Admin demotion is rejected.
+- Admin deactivation is rejected.
+- Invalid user ID returns 400.
+
+### Next
+
+Part 8 — Role authorization verification and Dashboard API.
