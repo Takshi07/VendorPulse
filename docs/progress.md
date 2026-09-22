@@ -235,3 +235,28 @@ Part 7 — User Management API.
 ### Next
 
 Part 8 — Role authorization verification and Dashboard API.
+
+## Part 8 — Dashboard API
+
+### Completed
+
+- Added dashboard endpoint for all authenticated roles.
+- Added selected year and quarter filtering.
+- Added current active supplier count.
+- Added evaluated supplier count for the selected period.
+- Added HIGH/CRITICAL risk count.
+- Added rating distribution with all four rating groups.
+- Added five most recent evaluations with supplier and evaluator data.
+- Added correct empty-state dashboard data.
+
+### Verified
+
+- Dashboard returns correct 2026 Q3 data.
+- Existing Nova evaluation appears with overall score 4.2.
+- EXCELLENT distribution count is correct.
+- Empty period returns zero evaluation metrics and no recent evaluations.
+- Viewer can access the dashboard.
+
+### Next
+
+Part 9 — Supplier Comparison API.
