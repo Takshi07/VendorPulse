@@ -260,3 +260,30 @@ Part 8 — Role authorization verification and Dashboard API.
 ### Next
 
 Part 9 — Supplier Comparison API.
+
+## Part 9 — Supplier Comparison API
+
+### Completed
+
+- Added supplier comparison endpoint for all authenticated roles.
+- Supports exactly 2 or 3 distinct suppliers.
+- Added year and quarter validation.
+- Requires every selected supplier to have an evaluation for the selected period.
+- Added `MISSING_EVALUATION` response with missing supplier IDs.
+- Requires matching criteria signatures across evaluations.
+- Added `INCOMPATIBLE_CRITERIA` protection.
+- KPI scores are matched using KPI IDs rather than array positions.
+- Comparison returns KPI names, weights, scores, overall scores, ratings and risk levels.
+- No artificial winner or tiebreaker is generated.
+
+### Verified
+
+- Single-supplier comparison is rejected with 400.
+- Second supplier evaluation was successfully submitted.
+- Two evaluated suppliers can be compared for the same period.
+- Comparison returns the expected supplier and KPI results.
+- Supplier without an evaluation returns 400 with `MISSING_EVALUATION`.
+
+### Next
+
+Part 10 — Reports API and CSV export.

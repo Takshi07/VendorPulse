@@ -54,9 +54,16 @@ export function errorHandler(err, req, res, next) {
     const response = {
       message: err.message,
     };
+
     if (err.code) {
       response.code = err.code;
     }
+
+    if (err.missingSupplierIds) {
+      response.missingSupplierIds =
+        err.missingSupplierIds;
+    }
+
     return res.status(err.status).json(response);
   }
 

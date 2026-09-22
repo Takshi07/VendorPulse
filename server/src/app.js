@@ -7,6 +7,7 @@ import kpiRoutes from "./routes/kpiRoutes.js";
 import evaluationRoutes from "./routes/evaluationRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import comparisonRoutes from "./routes/comparisonRoutes.js";
 
 import { errorHandler } from "./middleware/errorHandler.js";
 
@@ -22,6 +23,7 @@ app.use("/api/kpis", kpiRoutes);
 app.use("/api", evaluationRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/comparisons", comparisonRoutes);
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({
