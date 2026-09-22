@@ -8,6 +8,7 @@ import evaluationRoutes from "./routes/evaluationRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import comparisonRoutes from "./routes/comparisonRoutes.js";
+import reportRoutes from "./routes/reportRoutes.js";
 
 import { errorHandler } from "./middleware/errorHandler.js";
 
@@ -24,6 +25,7 @@ app.use("/api", evaluationRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/comparisons", comparisonRoutes);
+app.use("/api/reports", reportRoutes);
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({
