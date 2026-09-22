@@ -287,3 +287,28 @@ Part 9 — Supplier Comparison API.
 ### Next
 
 Part 10 — Reports API and CSV export.
+
+## Part 10 — Reports API and CSV Export
+
+### Completed
+
+- Added evaluation reports endpoint for all authenticated roles.
+- Added supplier, year and quarter filtering.
+- Added paginated screen report results.
+- Added CSV export using the same report filters.
+- Added CSV escaping for commas, quotes and line breaks.
+- Added a 10,000-row export limit.
+- Reports include supplier, category, period, overall score, rating, risk, evaluator and submission time.
+- Export rejects oversized reports instead of silently truncating them.
+
+### Verified
+
+- 2026 Q3 report returns Nova Supplies and Orion Industries.
+- Report pagination total is correct.
+- Supplier filtering returns only the selected supplier.
+- CSV export contains all matching Q3 evaluations.
+- CSV supplier filtering matches the screen report filtering.
+
+### Next
+
+Part 11 — Backend hardening and completion audit.
