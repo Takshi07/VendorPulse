@@ -541,3 +541,70 @@ Status: Completed
 ### Next
 
 Frontend F5 — Implement Evaluations.
+
+## Frontend F5 — Evaluations
+
+Status: Completed
+
+### Files Changed
+
+- `client/src/App.jsx`
+- `client/src/evaluations/evaluationUtils.js`
+- `client/src/pages/EvaluationsPage.jsx`
+- `client/src/pages/EvaluationFormPage.jsx`
+- `client/src/pages/EvaluationReviewPage.jsx`
+- `client/src/pages/EvaluationResultPage.jsx`
+- `client/src/pages/EvaluationPages.css`
+- `docs/progress.md`
+
+### Completed
+
+- Replaced all Evaluation placeholders with production list, create, review, and immutable result screens connected to the existing Evaluation API.
+- Added evaluation listing for all authenticated roles with supplier/year/quarter filters, backend pagination, loading skeleton, refresh errors, success feedback, and filtered/no-data states.
+- Added Manager/Admin-only create and review routes while preserving all-role history and result access.
+- Added dynamic ACTIVE supplier and KPI loading through `GET /api/evaluation-config`, including invalid-active-weight handling.
+- Added required supplier/period validation, one integer score from 1–5 for every active KPI, optional 500-character KPI comments, and optional 2,000-character overall comments.
+- Added a live weighted-score, performance-rating, and risk preview using the current server-provided KPI weights while keeping the backend authoritative at submission.
+- Added the client-side review screen with supplier, period, score, weight, KPI comments, overall comments, and an explicit immutable-submission warning.
+- Added final submission through `POST /api/evaluations`, clear duplicate-period errors, and no edit/delete affordances after submission.
+- Added `CRITERIA_CHANGED` recovery that fetches the new configuration, preserves scores/comments only for unchanged KPI IDs, drops removed criteria, leaves new criteria unscored, and requires another review before resubmission.
+- Added the read-only result screen using saved `kpiNameSnapshot` and `weightSnapshot` values rather than current KPI definitions.
+- Added screenshot-aligned evaluation tables, scoring rows, review/result score cards, status messaging, and responsive layouts using the established design system.
+
+### Reference and Contract Findings
+
+- The review screen is entirely client-side because the backend has no draft or review endpoint; draft data is passed in router state and is never stored in browser storage.
+- `GET /api/evaluation-config` is limited to Admin and Procurement Manager and returns only ACTIVE suppliers/KPIs plus the criteria signature and weight validity.
+- `GET /api/evaluations` supports only supplier ID, year, quarter, page, and limit filters. The frontend loads supplier options separately because the list response has no filter metadata endpoint.
+- Per-KPI comments, list filters/pagination, validation states, and criteria-change recovery have no dedicated screenshots and are inferred from the existing VendorPulse design system.
+- The result endpoint returns immutable score snapshots with populated supplier/evaluator details; current KPI lookups are intentionally not used for historical display.
+
+### Data-State Correction
+
+- Initial F5 verification found an unexpected ACTIVE `Speed` KPI at 1%, making the live evaluation configuration total 101% despite the stated Quality 45%, Delivery 30%, Cost 25% baseline.
+- The `Speed` record was deactivated—not deleted—through the existing KPI API. The Codex F4 KPI remains inactive, and the final active configuration is exactly Quality 45%, Delivery 30%, and Cost 25%.
+
+### Verified
+
+- `npm run lint` passes.
+- `npm run build` passes.
+- Client checks pass for required fields, score boundaries, comment limits, exact 4.20 weighted preview, payload construction, and unchanged-KPI-ID reconciliation.
+- Admin and Procurement Manager can load the valid evaluation configuration; Viewer receives 403.
+- Viewer submission receives 403, while Procurement Manager successfully submitted the single permanent F5 test evaluation.
+- A score outside 1–5 is rejected, an archived supplier is rejected, a stale signature returns 409 with `CRITERIA_CHANGED`, and a duplicate supplier/year/quarter returns 409.
+- Admin, Procurement Manager, and Viewer can filter and paginate evaluation history and retrieve the read-only result.
+- The client preview and backend authoritative result both equal 4.20, EXCELLENT, LOW for the submitted 45/30/25 test scores.
+- Overall and per-KPI comments are stored and returned.
+- Temporary coordinated current-weight and KPI-name changes left the submitted snapshot names/weights unchanged; the original current KPI name and weights were restored afterward.
+- The F5 test supplier was archived after submission and is excluded from future evaluation configuration while its result remains readable.
+- Final evaluation configuration is valid at exactly 100% with Quality 45%, Delivery 30%, and Cost 25%.
+- Permanent test supplier: `6ab3f65e9b3ce3d89dd011b4`; permanent Q4 2099 evaluation: `6ab3f65f9b3ce3d89dd011b5`.
+- Browser verification confirms an unauthenticated direct `/evaluations/new` URL redirects to Login without console errors.
+
+### Not Verified
+
+- Authenticated screenshot comparison and logged-in Viewer direct-route navigation could not be exercised because the only available browser session was signed out and no usable test credentials are stored. API permissions, role-aware controls, and the Manager/Admin `ProtectedRoute` were verified instead.
+
+### Next
+
+Frontend F6 — Implement Compare and Reports.

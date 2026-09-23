@@ -4,6 +4,10 @@ import { ProtectedRoute } from './auth/ProtectedRoute.jsx'
 import AppLayout from './layout/AppLayout.jsx'
 import AccessDeniedPage from './pages/AccessDeniedPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
+import EvaluationFormPage from './pages/EvaluationFormPage.jsx'
+import EvaluationResultPage from './pages/EvaluationResultPage.jsx'
+import EvaluationReviewPage from './pages/EvaluationReviewPage.jsx'
+import EvaluationsPage from './pages/EvaluationsPage.jsx'
 import KpiFormPage from './pages/KpiFormPage.jsx'
 import KpisPage from './pages/KpisPage.jsx'
 import KpiWeightsPage from './pages/KpiWeightsPage.jsx'
@@ -59,10 +63,12 @@ function App() {
                 <Route path="suppliers/new" element={<SupplierFormPage mode="create" />} />
                 <Route path="suppliers/:supplierId/edit" element={<SupplierFormPage mode="edit" />} />
               </Route>
-              <Route path="evaluations" element={<Page type="evaluations" />} />
-              <Route path="evaluations/new" element={<Page type="evaluationNew" />} />
-              <Route path="evaluations/review" element={<Page type="evaluationReview" />} />
-              <Route path="evaluations/:evaluationId" element={<Page type="evaluationResult" />} />
+              <Route path="evaluations" element={<EvaluationsPage />} />
+              <Route path="evaluations/:evaluationId" element={<EvaluationResultPage />} />
+              <Route element={<ProtectedRoute allowedRoles={MANAGER_ROLES} />}>
+                <Route path="evaluations/new" element={<EvaluationFormPage />} />
+                <Route path="evaluations/review" element={<EvaluationReviewPage />} />
+              </Route>
               <Route path="compare" element={<Page type="compare" />} />
               <Route path="reports" element={<Page type="reports" />} />
               <Route path="access-denied" element={<AccessDeniedPage />} />
