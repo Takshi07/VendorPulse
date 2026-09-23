@@ -376,3 +376,52 @@ Status: Completed
 ### Next
 
 Frontend F2 — Implement the live Dashboard and complete its data, loading, empty, and error states.
+
+## Frontend F2 — Login and Dashboard
+
+Status: Completed
+
+### Files Changed
+
+- `client/src/App.jsx`
+- `client/src/App.css`
+- `client/src/pages/LoginPage.jsx`
+- `client/src/pages/DashboardPage.jsx`
+- `client/src/pages/DashboardPage.css`
+- `docs/progress.md`
+
+### Completed
+
+- Replaced the Dashboard phase placeholder with a production Dashboard page connected to `GET /api/dashboard`.
+- Added a reporting-period selector covering the current and previous 15 quarters.
+- Added the Active suppliers, Suppliers evaluated, and High / critical risk summary cards using live backend metrics.
+- Added the four-category rating distribution while preserving categories whose count is zero.
+- Added recent evaluation rows with server-calculated scores, rating and risk formatting, and links to the read-only evaluation result routes.
+- Added a screenshot-aligned dashboard grid, panels, progress bars, table, status chips, responsive layout, and loading skeleton.
+- Added dashboard retry handling, background period-refresh feedback, accurate stale-period labeling after a failed refresh, and an empty recent-evaluations state.
+- Added expired-session handling that re-runs session restoration when the Dashboard receives a 401 response.
+- Refined Login with field-specific required validation, email format validation, accessible error associations, backend authentication messages, and full intended-route restoration after sign-in.
+- Removed the extra Login security icon to match the supplied screenshot more closely.
+- Continued to use the existing HttpOnly cookie session flow without browser storage.
+
+### Verified
+
+- `npm run lint` passes.
+- `npm run build` passes.
+- Invalid API login returns 401 with `Invalid email or password`.
+- Browser verification confirms required-field errors and the invalid-credentials message appear correctly.
+- Browser verification confirms the final Login screen matches the supplied layout at desktop width without horizontal overflow.
+- Read-only integration checks using active database users and the existing JWT helper confirm `/api/auth/me` and `/api/dashboard?year=2026&quarter=3` return 200 for Admin, Procurement Manager, and Viewer.
+- The real Q3 2026 Dashboard response contains live metrics, all four rating keys, and recent evaluations.
+- Switching to the real empty Q2 2026 period returns zero evaluated suppliers, zero risk count, all-zero rating categories, and no recent evaluations.
+- Logout returns 200 and the cleared session cookie produces 401 from `/api/auth/me`.
+
+### Not Verified
+
+- Successful login through the browser could not be tested because the current server environment does not contain usable test login credentials.
+- Authenticated Dashboard visual verification in the browser could not be completed for the same reason. Its layout was implemented directly from the supplied screenshot and its data contract was verified against the running backend.
+- Inactive-account login messaging could not be exercised because no credentials for an inactive account were available; the UI displays the backend's 403 message without rewriting it.
+
+### Next
+
+Frontend F3 — Implement Supplier list, details, add, and edit screens.

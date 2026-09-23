@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { LockKeyhole } from 'lucide-react'
 import { ApiError } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
 import Brand from '../components/Brand.jsx'
@@ -10,6 +9,7 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const [form, setForm] = useState({ email: '', password: '' })
+  const [fieldErrors, setFieldErrors] = useState({})
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -21,8 +21,21 @@ export default function LoginPage() {
     event.preventDefault()
     setError('')
 
-    if (!form.email.trim() || !form.password) {
-      setError('Enter your email address and password.')
+    const validationErrors = {}
+
+    if (!form.email.trim()) {
+      validationErrors.email = 'Email address is required.'
+    } else if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) {
+      validationErrors.email = 'Enter a valid email address.'
+    }
+
+    if (!form.password) {
+      validationErrors.password = 'Password is required.'
+    }
+
+    setFieldErrors(validationErrors)
+
+    if (Object.keys(validationErrors).length > 0) {
       return
     }
 
@@ -30,7 +43,10 @@ export default function LoginPage() {
 
     try {
       await login({ email: form.email.trim(), password: form.password })
-      const destination = location.state?.from?.pathname || '/dashboard'
+      const intendedLocation = location.state?.from
+      const destination = intendedLocation
+        ? `${intendedLocation.pathname}${intendedLocation.search || ''}${intendedLocation.hash || ''}`
+        : '/dashboard'
       navigate(destination, { replace: true })
     } catch (requestError) {
       setError(
@@ -59,7 +75,6 @@ export default function LoginPage() {
       <header className="login-header">
         <Brand linkTo={null} />
         <span className="login-header__security">
-          <LockKeyhole aria-hidden="true" />
           Secure workspace
         </span>
       </header>
@@ -82,10 +97,17 @@ export default function LoginPage() {
                 autoComplete="username"
                 placeholder="you@company.com"
                 value={form.email}
-                onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
+                aria-invalid={Boolean(fieldErrors.email)}
+                aria-describedby={fieldErrors.email ? 'email-error' : undefined}
+                onChange={(event) => {
+                  setForm((current) => ({ ...current, email: event.target.value }))
+                  setFieldErrors((current) => ({ ...current, email: '' }))
+                  setError('')
+                }}
                 disabled={isSubmitting}
                 required
               />
+              {fieldErrors.email ? <span className="field-error" id="email-error">{fieldErrors.email}</span> : null}
             </div>
 
             <div className="field">
@@ -97,10 +119,19 @@ export default function LoginPage() {
                 autoComplete="current-password"
                 placeholder="Enter your password"
                 value={form.password}
-                onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
+                aria-invalid={Boolean(fieldErrors.password)}
+                aria-describedby={fieldErrors.password ? 'password-error' : undefined}
+                onChange={(event) => {
+                  setForm((current) => ({ ...current, password: event.target.value }))
+                  setFieldErrors((current) => ({ ...current, password: '' }))
+                  setError('')
+                }}
                 disabled={isSubmitting}
                 required
               />
+              {fieldErrors.password ? (
+                <span className="field-error" id="password-error">{fieldErrors.password}</span>
+              ) : null}
             </div>
 
             {error ? <div className="form-error" role="alert">{error}</div> : null}

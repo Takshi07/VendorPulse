@@ -3,6 +3,7 @@ import { AuthProvider } from './auth/AuthContext.jsx'
 import { ProtectedRoute } from './auth/ProtectedRoute.jsx'
 import AppLayout from './layout/AppLayout.jsx'
 import AccessDeniedPage from './pages/AccessDeniedPage.jsx'
+import DashboardPage from './pages/DashboardPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import PlaceholderPage from './pages/PlaceholderPage.jsx'
@@ -11,7 +12,6 @@ import './App.css'
 const ADMIN = 'ADMIN'
 
 const pageDetails = {
-  dashboard: ['Performance overview', 'A clearer view of your supplier network.'],
   suppliers: ['Suppliers', 'Manage your vendor records and performance history.'],
   supplierNew: ['Add supplier', 'Keep contact and contract details in one place.'],
   supplierDetails: ['Supplier details', 'Review supplier information and performance history.'],
@@ -45,7 +45,7 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
               <Route index element={<Navigate to="/dashboard" replace />} />
-              <Route path="dashboard" element={<Page type="dashboard" />} />
+              <Route path="dashboard" element={<DashboardPage />} />
               <Route path="suppliers" element={<Page type="suppliers" />} />
               <Route path="suppliers/new" element={<Page type="supplierNew" />} />
               <Route path="suppliers/:supplierId" element={<Page type="supplierDetails" />} />

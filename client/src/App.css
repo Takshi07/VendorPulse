@@ -341,6 +341,10 @@
   line-height: 1.55;
 }
 
+.state-panel .button {
+  margin-top: 18px;
+}
+
 .state-panel__icon {
   color: var(--color-blue-600);
 }
@@ -447,6 +451,17 @@
   box-shadow: 0 0 0 3px rgb(78 130 183 / 13%);
 }
 
+.field input[aria-invalid="true"],
+.field select[aria-invalid="true"],
+.field textarea[aria-invalid="true"] {
+  border-color: #d78383;
+}
+
+.field-error {
+  color: var(--color-danger);
+  font-size: 12px;
+}
+
 .form-error {
   padding: 11px 13px;
   color: var(--color-danger);
@@ -504,11 +519,6 @@
   gap: 7px;
   color: var(--color-muted);
   font-size: 12px;
-}
-
-.login-header__security svg {
-  width: 14px;
-  height: 14px;
 }
 
 .login-main {
@@ -661,10 +671,6 @@
 
   .login-header {
     padding: 0 16px;
-  }
-
-  .login-header__security svg {
-    display: none;
   }
 
   .login-main {
