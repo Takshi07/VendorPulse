@@ -425,3 +425,61 @@ Status: Completed
 ### Next
 
 Frontend F3 — Implement Supplier list, details, add, and edit screens.
+
+## Frontend F3 — Supplier Management
+
+Status: Completed
+
+### Files Changed
+
+- `client/src/App.jsx`
+- `client/src/components/ConfirmDialog.jsx`
+- `client/src/components/Pagination.jsx`
+- `client/src/pages/SuppliersPage.jsx`
+- `client/src/pages/SupplierDetailsPage.jsx`
+- `client/src/pages/SupplierFormPage.jsx`
+- `client/src/pages/SupplierPages.css`
+- `client/src/suppliers/supplierUtils.js`
+- `docs/progress.md`
+
+### Completed
+
+- Replaced the Supplier placeholders with production list, detail, add, and edit pages connected to the existing Supplier API.
+- Added live supplier search across the backend-supported name, contact, email, and tax-ID fields.
+- Added exact category filtering, ACTIVE/ARCHIVED/all status filtering, backend pagination, refresh feedback, loading skeletons, retry handling, and filtered empty states.
+- Added supplier detail presentation for contact, address, tax ID, and partial or complete contract periods.
+- Added paginated evaluation history by combining `GET /api/suppliers/:id` with `GET /api/evaluations?supplierId=:id`.
+- Added create and edit forms with required name/category validation, email validation, contract-date ordering, trimmed payload values, backend duplicate-tax-ID messaging, and success feedback.
+- Added a confirmation dialog for the one-way archive action and retained archived suppliers for historical detail and evaluation-result viewing.
+- Restricted add, edit, archive, and evaluate controls/routes to Admin and Procurement Manager. Viewer retains read-only list, detail, and evaluation-history access.
+- Hid the Evaluate supplier action for archived records, matching the backend rule that only ACTIVE suppliers can be evaluated.
+- Added responsive supplier tables, forms, details, action groups, filters, and pagination using the existing F1/F2 tokens and shared layout.
+
+### Reference and Contract Findings
+
+- The supplied list screenshot says “Search name or category,” but backend text search does not include category. The frontend uses an accurate search placeholder and a separate exact-match category filter backed by the existing `category` query parameter.
+- Supplier detail responses do not embed evaluation history, so the detail screen makes a separate paginated evaluation-list request.
+- The backend supports editing archived supplier details but provides no unarchive or permanent-delete route. The frontend therefore allows authorized edits while omitting evaluation and archive actions after archiving.
+- Pagination, confirmation, validation, error, and empty-state presentations are inferred from the established VendorPulse design system because dedicated reference screenshots were not provided for those states.
+
+### Verified
+
+- `npm run lint` passes.
+- `npm run build` passes.
+- Supplier form checks cover required name/category, email format, contract-date ordering, and payload trimming.
+- A real, clearly named F3 test supplier was created by Admin and archived at the end of testing; unrelated supplier data was not changed.
+- Real API checks passed for text search, exact category filtering, ACTIVE/ARCHIVED filtering, pagination metadata, individual details, and supplier evaluation history.
+- Duplicate tax ID returns 409 with the expected clear message.
+- Invalid contract date order returns 400 with the expected validation message.
+- Procurement Manager can edit and archive suppliers.
+- Viewer can list suppliers, search/filter, open details, and read evaluation history, while create, edit, and archive requests return 403.
+- The archived test supplier remains available under the ARCHIVED filter and for Viewer detail access, is absent from ACTIVE results, and is excluded from evaluation configuration.
+- Browser verification confirms an unauthenticated Supplier URL restores the existing protected-route behavior and redirects to Login without console errors.
+
+### Not Verified
+
+- Authenticated visual comparison and interactive add/edit/archive checks could not be completed in the browser because the available browser session was signed out and no usable test login credentials are stored in the project. The implementation was visually derived from supplier screenshots 03–06 and the live data/role behavior was verified through the running API.
+
+### Next
+
+Frontend F4 — Implement KPI Management and coordinated weights.

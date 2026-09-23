@@ -7,6 +7,10 @@ import DashboardPage from './pages/DashboardPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import PlaceholderPage from './pages/PlaceholderPage.jsx'
+import SupplierDetailsPage from './pages/SupplierDetailsPage.jsx'
+import SupplierFormPage from './pages/SupplierFormPage.jsx'
+import SuppliersPage from './pages/SuppliersPage.jsx'
+import { MANAGER_ROLES } from './suppliers/supplierUtils.js'
 import './App.css'
 
 const ADMIN = 'ADMIN'
@@ -46,10 +50,12 @@ function App() {
             <Route element={<AppLayout />}>
               <Route index element={<Navigate to="/dashboard" replace />} />
               <Route path="dashboard" element={<DashboardPage />} />
-              <Route path="suppliers" element={<Page type="suppliers" />} />
-              <Route path="suppliers/new" element={<Page type="supplierNew" />} />
-              <Route path="suppliers/:supplierId" element={<Page type="supplierDetails" />} />
-              <Route path="suppliers/:supplierId/edit" element={<Page type="supplierEdit" />} />
+              <Route path="suppliers" element={<SuppliersPage />} />
+              <Route path="suppliers/:supplierId" element={<SupplierDetailsPage />} />
+              <Route element={<ProtectedRoute allowedRoles={MANAGER_ROLES} />}>
+                <Route path="suppliers/new" element={<SupplierFormPage mode="create" />} />
+                <Route path="suppliers/:supplierId/edit" element={<SupplierFormPage mode="edit" />} />
+              </Route>
               <Route path="evaluations" element={<Page type="evaluations" />} />
               <Route path="evaluations/new" element={<Page type="evaluationNew" />} />
               <Route path="evaluations/review" element={<Page type="evaluationReview" />} />
