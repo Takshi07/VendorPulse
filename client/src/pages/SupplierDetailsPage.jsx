@@ -6,6 +6,7 @@ import { EmptyState, ErrorState, LoadingState } from '../components/AsyncState.j
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import PageHeader from '../components/PageHeader.jsx'
 import Pagination from '../components/Pagination.jsx'
+import RatingBadge from '../components/RatingBadge.jsx'
 import {
   canManageSuppliers,
   formatDate,
@@ -22,13 +23,6 @@ function DetailItem({ label, children }) {
       <dd>{children || 'Not provided'}</dd>
     </div>
   )
-}
-
-function evaluationChipClass(rating) {
-  if (rating === 'EXCELLENT') return 'status-chip status-chip--success'
-  if (rating === 'GOOD') return 'status-chip status-chip--info'
-  if (rating === 'NEEDS_IMPROVEMENT') return 'status-chip status-chip--warning'
-  return 'status-chip status-chip--danger'
 }
 
 function contractPeriod(supplier) {
@@ -246,7 +240,7 @@ export default function SupplierDetailsPage() {
                       <tr key={evaluation._id}>
                         <td>Q{evaluation.quarter} {evaluation.year}</td>
                         <td>{Number(evaluation.overallScore).toFixed(2)}</td>
-                        <td><span className={evaluationChipClass(evaluation.performanceRating)}>{formatEnum(evaluation.performanceRating)}</span></td>
+                        <td><RatingBadge rating={evaluation.performanceRating} /></td>
                         <td><Link className="table-action" to={`/evaluations/${evaluation._id}`}>View</Link></td>
                       </tr>
                     ))}

@@ -4,6 +4,7 @@ import { api, ApiError } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
 import { ErrorState, LoadingState } from '../components/AsyncState.jsx'
 import PageHeader from '../components/PageHeader.jsx'
+import RatingBadge from '../components/RatingBadge.jsx'
 import { formatEnum, periodLabel } from '../evaluations/evaluationUtils.js'
 import './EvaluationPages.css'
 
@@ -82,7 +83,8 @@ export default function EvaluationResultPage() {
           <strong>{Number(evaluation.overallScore).toFixed(2)}</strong><span>/ 5</span>
         </div>
         <p className="evaluation-classification">
-          {formatEnum(evaluation.performanceRating)} performance · {formatEnum(evaluation.riskLevel)} risk
+          <RatingBadge rating={evaluation.performanceRating} />
+          <span>performance · {formatEnum(evaluation.riskLevel)} risk</span>
         </p>
 
         <div className="evaluation-summary-table" role="table" aria-label="Submitted KPI score snapshots">

@@ -4,6 +4,7 @@ import { api, ApiError } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
 import { ErrorState, LoadingState } from '../components/AsyncState.jsx'
 import PageHeader from '../components/PageHeader.jsx'
+import RatingBadge from '../components/RatingBadge.jsx'
 import {
   calculateWeightedPreview,
   emptyEvaluationDraft,
@@ -216,7 +217,12 @@ export default function EvaluationFormPage() {
           <div className="evaluation-preview-banner" aria-live="polite">
             <span>Weighted score preview</span>
             <strong>{previewScore === null ? '—' : previewScore.toFixed(2)} <small>/ 5</small></strong>
-            <span>{preview ? `${formatEnum(preview.rating)} performance · ${formatEnum(preview.risk)} risk` : 'Complete every KPI score to see a preview.'}</span>
+            {preview ? (
+              <span className="evaluation-preview-classification">
+                <RatingBadge rating={preview.rating} />
+                <span>performance · {formatEnum(preview.risk)} risk</span>
+              </span>
+            ) : <span>Complete every KPI score to see a preview.</span>}
           </div>
 
           <label className="field evaluation-overall-comments">

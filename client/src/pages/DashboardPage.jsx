@@ -4,6 +4,7 @@ import { api, ApiError } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
 import { EmptyState, ErrorState } from '../components/AsyncState.jsx'
 import PageHeader from '../components/PageHeader.jsx'
+import RatingBadge from '../components/RatingBadge.jsx'
 import './DashboardPage.css'
 
 const ratingOrder = [
@@ -247,11 +248,7 @@ export default function DashboardPage() {
                           </Link>
                         </td>
                         <td>{Number(evaluation.overallScore).toFixed(2)}</td>
-                        <td>
-                          <span className={evaluation.performanceRating === 'EXCELLENT' ? 'status-chip status-chip--success' : ''}>
-                            {labelFromEnum(evaluation.performanceRating)}
-                          </span>
-                        </td>
+                        <td><RatingBadge rating={evaluation.performanceRating} /></td>
                         <td>
                           <span className={`status-chip risk-chip risk-chip--${evaluation.riskLevel.toLowerCase()}`}>
                             {labelFromEnum(evaluation.riskLevel)}

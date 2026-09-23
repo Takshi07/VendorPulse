@@ -3,6 +3,7 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { api, ApiError } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
 import PageHeader from '../components/PageHeader.jsx'
+import RatingBadge from '../components/RatingBadge.jsx'
 import {
   calculateWeightedPreview,
   formatEnum,
@@ -101,7 +102,8 @@ export default function EvaluationReviewPage() {
           <strong>{previewScore?.toFixed(2)}</strong><span>/ 5</span>
         </div>
         <p className="evaluation-classification">
-          {formatEnum(preview.rating)} performance · {formatEnum(preview.risk)} risk
+          <RatingBadge rating={preview.rating} />
+          <span>performance · {formatEnum(preview.risk)} risk</span>
         </p>
 
         <div className="evaluation-summary-table" role="table" aria-label="Evaluation review scores">

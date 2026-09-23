@@ -415,6 +415,51 @@
   background: var(--color-danger-bg);
 }
 
+.rating-badge {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.rating-badge--excellent {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+  border-color: #c8e5da;
+}
+
+.rating-badge--good {
+  color: var(--color-blue-700);
+  background: var(--color-blue-100);
+  border-color: var(--color-blue-200);
+}
+
+.rating-badge--needs-improvement {
+  color: var(--color-warning);
+  background: var(--color-warning-bg);
+  border-color: #f0d79c;
+}
+
+.rating-badge--poor {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+  border-color: #edcaca;
+}
+
+.rating-badge--neutral {
+  color: var(--color-muted);
+  background: #edf2f7;
+  border-color: var(--color-border);
+}
+
 .field {
   display: grid;
   gap: 7px;

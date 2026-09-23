@@ -6,7 +6,8 @@ import { useAuth } from '../auth/useAuth.js'
 import { EmptyState, ErrorState } from '../components/AsyncState.jsx'
 import PageHeader from '../components/PageHeader.jsx'
 import Pagination from '../components/Pagination.jsx'
-import { formatEnum, periodLabel } from '../evaluations/evaluationUtils.js'
+import RatingBadge from '../components/RatingBadge.jsx'
+import { periodLabel } from '../evaluations/evaluationUtils.js'
 import { canManageSuppliers } from '../suppliers/supplierUtils.js'
 import './EvaluationPages.css'
 
@@ -195,13 +196,7 @@ export default function EvaluationsPage() {
                         <td>{evaluation.supplierId?.supplierName || 'Unavailable supplier'}</td>
                         <td>{periodLabel(evaluation.year, evaluation.quarter)}</td>
                         <td>{Number(evaluation.overallScore).toFixed(2)}</td>
-                        <td>
-                          <span className={evaluation.performanceRating === 'EXCELLENT'
-                            ? 'status-chip status-chip--success'
-                            : ''}>
-                            {formatEnum(evaluation.performanceRating)}
-                          </span>
-                        </td>
+                        <td><RatingBadge rating={evaluation.performanceRating} /></td>
                         <td><Link className="table-action" to={`/evaluations/${evaluation._id}`}>View</Link></td>
                       </tr>
                     ))}
