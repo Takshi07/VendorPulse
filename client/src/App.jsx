@@ -3,6 +3,7 @@ import { AuthProvider } from './auth/AuthContext.jsx'
 import { ProtectedRoute } from './auth/ProtectedRoute.jsx'
 import AppLayout from './layout/AppLayout.jsx'
 import AccessDeniedPage from './pages/AccessDeniedPage.jsx'
+import ComparePage from './pages/ComparePage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import EvaluationFormPage from './pages/EvaluationFormPage.jsx'
 import EvaluationResultPage from './pages/EvaluationResultPage.jsx'
@@ -14,6 +15,7 @@ import KpiWeightsPage from './pages/KpiWeightsPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import PlaceholderPage from './pages/PlaceholderPage.jsx'
+import ReportsPage from './pages/ReportsPage.jsx'
 import SupplierDetailsPage from './pages/SupplierDetailsPage.jsx'
 import SupplierFormPage from './pages/SupplierFormPage.jsx'
 import SuppliersPage from './pages/SuppliersPage.jsx'
@@ -69,8 +71,8 @@ function App() {
                 <Route path="evaluations/new" element={<EvaluationFormPage />} />
                 <Route path="evaluations/review" element={<EvaluationReviewPage />} />
               </Route>
-              <Route path="compare" element={<Page type="compare" />} />
-              <Route path="reports" element={<Page type="reports" />} />
+              <Route path="compare" element={<ComparePage />} />
+              <Route path="reports" element={<ReportsPage />} />
               <Route path="access-denied" element={<AccessDeniedPage />} />
 
               <Route element={<ProtectedRoute allowedRoles={[ADMIN]} />}>

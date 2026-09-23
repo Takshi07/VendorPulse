@@ -608,3 +608,70 @@ Status: Completed
 ### Next
 
 Frontend F6 — Implement Compare and Reports.
+
+## Frontend F6 — Compare and Reports
+
+Status: Completed
+
+### Files Changed
+
+- `client/src/App.jsx`
+- `client/src/App.css`
+- `client/src/api/client.js`
+- `client/src/comparison/comparisonUtils.js`
+- `client/src/components/RiskBadge.jsx`
+- `client/src/suppliers/supplierApi.js`
+- `client/src/pages/ComparePage.jsx`
+- `client/src/pages/ReportsPage.jsx`
+- `client/src/pages/CompareReports.css`
+- `client/src/pages/DashboardPage.jsx`
+- `client/src/pages/DashboardPage.css`
+- `client/src/pages/EvaluationsPage.jsx`
+- `docs/progress.md`
+
+### Completed
+
+- Replaced the Compare and Reports placeholders with production screens connected to the existing backend APIs.
+- Added comparison selection for exactly two or three distinct suppliers, with year/quarter controls, client validation, loading/empty/error states, and responsive horizontal table scrolling.
+- Added side-by-side display of saved KPI names, weights, KPI scores, overall scores, performance ratings, and risk levels without calculating rankings or inventing missing values.
+- Added explicit, useful handling for `MISSING_EVALUATION` and `INCOMPATIBLE_CRITERIA` responses.
+- Added the evaluation report table with supplier, category, period, score, rating, risk, evaluator, submitted date, result navigation, backend pagination, and supplier/year/quarter filters.
+- Added credentialed CSV downloads through the centralized API helper. Exports use the applied report filters, surface backend failures, and retain the backend filename/CSV contract.
+- Added a shared `RiskBadge` and reused it on Dashboard, Compare, and Reports while retaining the shared performance `RatingBadge` for all ratings.
+- Extracted the existing paginated supplier-option loader for reuse by Evaluations, Compare, and Reports.
+- Kept Compare and Reports under the existing authenticated application shell so Admin, Procurement Manager, and Viewer receive the same permitted access.
+
+### Reference and Contract Findings
+
+- `GET /api/comparisons` accepts repeated or comma-separated `supplierIds` plus `year` and `quarter`, and requires exactly two or three distinct supplier IDs.
+- The comparison response supplies the authoritative overall classifications and immutable KPI snapshot rows; the frontend does not recompute results or choose a winner, so ties are preserved.
+- `GET /api/reports/evaluations` and `GET /api/reports/evaluations.csv` support supplier ID, year, and quarter filters only. Rating and risk filters are not implemented because the backend does not accept them.
+- The report response includes populated supplier and evaluator records in addition to score, rating, risk, period, and submission timestamps. The Reports screenshot shows a smaller column set; the extra backend-supported fields use the established table design and horizontal scrolling.
+- CSV export is capped by the backend at 10,000 rows and returns a clear narrowing-filters error above that limit.
+- Compare and Reports are authorized for all three current roles by the backend routes.
+
+### Verified
+
+- `npm run lint` passes.
+- `npm run build` passes.
+- Client checks pass for two/three-supplier validation, duplicate prevention, repeated `supplierIds` serialization, missing/incompatible comparison messaging, and CSV URL serialization with active supplier/year/quarter filters.
+- Admin, Procurement Manager, and Viewer each receive 200 responses from comparison and reporting endpoints.
+- Nova Supplies versus Orion Industries for Q3 2026 returns 4.20 / EXCELLENT / LOW and 3.85 / GOOD / MODERATE respectively.
+- Every returned Nova/Orion KPI name, weight, and score matches its stored historical evaluation snapshot.
+- Backend requests with a duplicate supplier, fewer than two suppliers, or more than three suppliers each return 400; the UI also prevents duplicate checkbox choices and disables additional choices at three.
+- A supplier without an evaluation returns 400 with `MISSING_EVALUATION`, and the client identifies the missing supplier/period in its message.
+- Report filtering by Q3 2026 returns the two expected records for every role; filtering by Nova Supplies returns exactly one matching record.
+- Backend report pagination was verified with a one-record page size across pages 1 and 2.
+- Filtered CSV export contains the expected header and Nova record while excluding Orion; period-only export contains both Q3 2026 records.
+- Direct unauthenticated browser navigation to both `/compare` and `/reports` redirects to Login.
+- F6 API verification performed zero database writes; no supplier, KPI, evaluation, or user records were changed.
+
+### Not Verified
+
+- No existing pair of evaluations in the same period has different criteria signatures, so a live 409 `INCOMPATIBLE_CRITERIA` response could not be produced without changing permanent data. The backend branch was inspected and the client error mapping was verified directly.
+- The 10,000-row CSV export limit could not be exercised because the development dataset is much smaller; its backend contract and frontend error propagation were inspected.
+- Authenticated browser interaction, screenshot-level visual comparison, and live small-viewport checks could not be completed because the available browser session is signed out and no usable credentials are stored in the project. These require manual verification.
+
+### Next
+
+Await manual F6 verification before starting Frontend F7 — User Management.

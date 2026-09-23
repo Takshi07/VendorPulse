@@ -1,56 +1,64 @@
 import { useEffect, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { Plus } from 'lucide-react'
+import { Download } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { api, ApiError } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
 import { EmptyState, ErrorState } from '../components/AsyncState.jsx'
 import PageHeader from '../components/PageHeader.jsx'
 import Pagination from '../components/Pagination.jsx'
 import RatingBadge from '../components/RatingBadge.jsx'
-import { periodLabel } from '../evaluations/evaluationUtils.js'
+import RiskBadge from '../components/RiskBadge.jsx'
+import { currentPeriod, periodLabel } from '../evaluations/evaluationUtils.js'
 import { loadAllSuppliers } from '../suppliers/supplierApi.js'
-import { canManageSuppliers } from '../suppliers/supplierUtils.js'
-import './EvaluationPages.css'
+import './CompareReports.css'
 
 const PAGE_SIZE = 10
 
-function EvaluationListSkeleton() {
+function ReportSkeleton() {
   return (
-    <div className="evaluation-table-skeleton" aria-live="polite" aria-busy="true">
-      <span className="sr-only">Loading evaluations</span>
+    <div className="report-skeleton" aria-live="polite" aria-busy="true">
+      <span className="sr-only">Loading report</span>
       {[0, 1, 2, 3].map((row) => <span key={row} />)}
     </div>
   )
 }
 
-export default function EvaluationsPage() {
-  const location = useLocation()
-  const { user, restoreSession } = useAuth()
-  const [filterValues, setFilterValues] = useState({ supplierId: '', year: '', quarter: '' })
-  const [filters, setFilters] = useState({ supplierId: '', year: '', quarter: '' })
+function formatDate(value) {
+  if (!value) return 'Unavailable'
+  return new Intl.DateTimeFormat(undefined, { day: '2-digit', month: 'short', year: 'numeric' })
+    .format(new Date(value))
+}
+
+export default function ReportsPage() {
+  const { restoreSession } = useAuth()
+  const [initialFilters] = useState(() => ({ supplierId: '', ...currentPeriod() }))
+  const [filterValues, setFilterValues] = useState(initialFilters)
+  const [filters, setFilters] = useState(initialFilters)
   const [page, setPage] = useState(1)
   const [data, setData] = useState(null)
   const [suppliers, setSuppliers] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [requestVersion, setRequestVersion] = useState(0)
-  const [notice, setNotice] = useState(location.state?.success || '')
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState('')
+  const [exportNotice, setExportNotice] = useState('')
 
   useEffect(() => {
     const controller = new AbortController()
 
-    async function loadEvaluations() {
+    async function loadReport() {
       setLoading(true)
       setError('')
       try {
-        const [evaluationResponse, supplierResponse] = await Promise.all([
-          api.get('/evaluations', {
+        const [reportResponse, supplierResponse] = await Promise.all([
+          api.get('/reports/evaluations', {
             query: { page, limit: PAGE_SIZE, ...filters },
             signal: controller.signal,
           }),
           loadAllSuppliers(controller.signal),
         ])
-        setData(evaluationResponse)
+        setData(reportResponse)
         setSuppliers(supplierResponse)
       } catch (requestError) {
         if (controller.signal.aborted) return
@@ -60,13 +68,13 @@ export default function EvaluationsPage() {
         }
         setError(requestError instanceof ApiError
           ? requestError.message
-          : 'Unable to load evaluations. Check your connection and try again.')
+          : 'Unable to load the report. Check your connection and try again.')
       } finally {
         if (!controller.signal.aborted) setLoading(false)
       }
     }
 
-    loadEvaluations()
+    loadReport()
     return () => controller.abort()
   }, [filters, page, requestVersion, restoreSession])
 
@@ -74,6 +82,8 @@ export default function EvaluationsPage() {
     event.preventDefault()
     setFilters(filterValues)
     setPage(1)
+    setExportError('')
+    setExportNotice('')
   }
 
   function clearFilters() {
@@ -81,31 +91,52 @@ export default function EvaluationsPage() {
     setFilterValues(cleared)
     setFilters(cleared)
     setPage(1)
+    setExportError('')
+    setExportNotice('')
+  }
+
+  async function exportCsv() {
+    setExporting(true)
+    setExportError('')
+    setExportNotice('')
+    try {
+      const result = await api.download('/reports/evaluations.csv', {
+        query: filters,
+        filename: 'vendorpulse-evaluations.csv',
+      })
+      setExportNotice(`${result.filename} downloaded using the active filters.`)
+    } catch (requestError) {
+      if (requestError instanceof ApiError && requestError.status === 401) {
+        await restoreSession()
+        return
+      }
+      setExportError(requestError instanceof ApiError
+        ? requestError.message
+        : 'Unable to export the report. Check your connection and try again.')
+    } finally {
+      setExporting(false)
+    }
   }
 
   const hasFilters = Boolean(filters.supplierId || filters.year || filters.quarter)
 
   return (
-    <div className="page-container evaluation-list-page">
+    <div className="page-container reports-page">
       <PageHeader
-        title="Evaluations"
-        description="Quarterly supplier assessments and their results."
-        actions={canManageSuppliers(user.role) ? (
-          <Link className="button button--primary" to="/evaluations/new">
-            <Plus aria-hidden="true" /> New evaluation
-          </Link>
-        ) : null}
+        title="Evaluation reports"
+        description="Filter submitted evaluation records and export the selected results."
+        actions={(
+          <button className="button button--primary" type="button" onClick={exportCsv} disabled={exporting || !data}>
+            <Download aria-hidden="true" /> {exporting ? 'Exporting…' : 'Export CSV'}
+          </button>
+        )}
       />
 
-      {notice ? (
-        <div className="evaluation-success-banner" role="status">
-          <span>{notice}</span>
-          <button type="button" onClick={() => setNotice('')} aria-label="Dismiss notification">Dismiss</button>
-        </div>
-      ) : null}
+      {exportNotice ? <div className="report-export-notice" role="status">{exportNotice}</div> : null}
+      {exportError ? <div className="report-export-error" role="alert">{exportError}</div> : null}
 
-      <section className="surface evaluation-list-card">
-        <form className="evaluation-filters" onSubmit={applyFilters}>
+      <section className="surface reports-card">
+        <form className="report-filters" onSubmit={applyFilters}>
           <label className="field">
             <span>Supplier</span>
             <select
@@ -137,24 +168,24 @@ export default function EvaluationsPage() {
               onChange={(event) => setFilterValues((current) => ({ ...current, quarter: event.target.value }))}
             >
               <option value="">All quarters</option>
-              {[1, 2, 3, 4].map((quarter) => <option value={quarter} key={quarter}>Q{quarter}</option>)}
+              {[1, 2, 3, 4].map((value) => <option value={value} key={value}>Q{value}</option>)}
             </select>
           </label>
-          <div className="evaluation-filter-actions">
+          <div className="report-filter-actions">
             <button className="button button--primary" type="submit">Apply</button>
             {hasFilters ? <button className="button button--secondary" type="button" onClick={clearFilters}>Clear</button> : null}
           </div>
         </form>
 
-        {loading && !data ? <EvaluationListSkeleton /> : null}
+        {loading && !data ? <ReportSkeleton /> : null}
         {error && !data ? (
           <ErrorState message={error} onRetry={() => setRequestVersion((version) => version + 1)} />
         ) : null}
 
         {data ? (
-          <div className={loading ? 'evaluation-results is-refreshing' : 'evaluation-results'}>
+          <div className={loading ? 'report-results is-refreshing' : 'report-results'}>
             {error ? (
-              <div className="evaluation-inline-error" role="alert">
+              <div className="report-inline-error" role="alert">
                 <span>{error}</span>
                 <button type="button" onClick={() => setRequestVersion((version) => version + 1)}>Try again</button>
               </div>
@@ -162,30 +193,39 @@ export default function EvaluationsPage() {
 
             {data.evaluations.length === 0 ? (
               <EmptyState
-                title={hasFilters ? 'No evaluations match these filters' : 'No evaluations yet'}
+                title={hasFilters ? 'No evaluations match these filters' : 'No evaluation records yet'}
                 message={hasFilters
                   ? 'Try a different supplier, year, or quarter.'
                   : 'Submitted supplier evaluations will appear here.'}
               />
             ) : (
               <div className="table-scroll">
-                <table className="evaluation-table">
+                <table className="report-table">
                   <thead>
                     <tr>
                       <th>Supplier</th>
                       <th>Period</th>
                       <th>Score / 5</th>
                       <th>Rating</th>
+                      <th>Risk</th>
+                      <th>Evaluator</th>
+                      <th>Submitted</th>
                       <th><span className="sr-only">Actions</span></th>
                     </tr>
                   </thead>
                   <tbody>
                     {data.evaluations.map((evaluation) => (
                       <tr key={evaluation._id}>
-                        <td>{evaluation.supplierId?.supplierName || 'Unavailable supplier'}</td>
+                        <td>
+                          <strong>{evaluation.supplierId?.supplierName || 'Unavailable supplier'}</strong>
+                          <small>{evaluation.supplierId?.category || 'No category'}</small>
+                        </td>
                         <td>{periodLabel(evaluation.year, evaluation.quarter)}</td>
                         <td>{Number(evaluation.overallScore).toFixed(2)}</td>
                         <td><RatingBadge rating={evaluation.performanceRating} /></td>
+                        <td><RiskBadge risk={evaluation.riskLevel} /></td>
+                        <td>{evaluation.evaluatorId?.name || 'Unavailable'}</td>
+                        <td>{formatDate(evaluation.createdAt)}</td>
                         <td><Link className="table-action" to={`/evaluations/${evaluation._id}`}>View</Link></td>
                       </tr>
                     ))}

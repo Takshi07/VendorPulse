@@ -5,6 +5,7 @@ import { useAuth } from '../auth/useAuth.js'
 import { EmptyState, ErrorState } from '../components/AsyncState.jsx'
 import PageHeader from '../components/PageHeader.jsx'
 import RatingBadge from '../components/RatingBadge.jsx'
+import RiskBadge from '../components/RiskBadge.jsx'
 import './DashboardPage.css'
 
 const ratingOrder = [
@@ -34,14 +35,6 @@ function buildPeriodOptions(count = 16) {
   }
 
   return options
-}
-
-function labelFromEnum(value = '') {
-  return value
-    .toLowerCase()
-    .split('_')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
 }
 
 function periodLabel({ year, quarter }) {
@@ -249,11 +242,7 @@ export default function DashboardPage() {
                         </td>
                         <td>{Number(evaluation.overallScore).toFixed(2)}</td>
                         <td><RatingBadge rating={evaluation.performanceRating} /></td>
-                        <td>
-                          <span className={`status-chip risk-chip risk-chip--${evaluation.riskLevel.toLowerCase()}`}>
-                            {labelFromEnum(evaluation.riskLevel)}
-                          </span>
-                        </td>
+                        <td><RiskBadge risk={evaluation.riskLevel} /></td>
                       </tr>
                     ))}
                   </tbody>

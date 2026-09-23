@@ -264,22 +264,6 @@
   text-decoration: underline;
 }
 
-.risk-chip--moderate {
-  color: var(--color-warning);
-  background: var(--color-warning-bg);
-}
-
-.risk-chip--high,
-.risk-chip--critical {
-  color: var(--color-danger);
-  background: var(--color-danger-bg);
-}
-
-.risk-chip--low {
-  color: var(--color-success);
-  background: var(--color-success-bg);
-}
-
 .dashboard-skeleton {
   display: grid;
   gap: 19px;

@@ -460,6 +460,46 @@
   border-color: var(--color-border);
 }
 
+.risk-badge {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.risk-badge--low {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+  border-color: #c8e5da;
+}
+
+.risk-badge--moderate {
+  color: var(--color-warning);
+  background: var(--color-warning-bg);
+  border-color: #f0d79c;
+}
+
+.risk-badge--high,
+.risk-badge--critical {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+  border-color: #edcaca;
+}
+
+.risk-badge--neutral {
+  color: var(--color-muted);
+  background: #edf2f7;
+  border-color: var(--color-border);
+}
+
 .field {
   display: grid;
   gap: 7px;

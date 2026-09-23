@@ -74,8 +74,46 @@ export const api = {
   post: (path, body, options = {}) => apiRequest(path, { ...options, method: 'POST', body }),
   patch: (path, body, options = {}) => apiRequest(path, { ...options, method: 'PATCH', body }),
   put: (path, body, options = {}) => apiRequest(path, { ...options, method: 'PUT', body }),
+  download: downloadApiFile,
 }
 
 export function getApiUrl(path, query) {
   return `${API_ROOT}${path}${toQueryString(query)}`
+}
+
+async function downloadApiFile(path, { query, filename } = {}) {
+  const response = await fetch(getApiUrl(path, query), {
+    credentials: 'include',
+    headers: { Accept: 'text/csv' },
+  })
+
+  if (!response.ok) {
+    const payload = await parseResponse(response)
+    throw new ApiError(
+      typeof payload === 'object' && payload?.message
+        ? payload.message
+        : 'The export could not be completed.',
+      {
+        status: response.status,
+        code: payload?.code,
+        details: payload,
+      },
+    )
+  }
+
+  const blob = await response.blob()
+  const contentDisposition = response.headers.get('content-disposition') || ''
+  const headerFilename = contentDisposition.match(/filename="?([^";]+)"?/i)?.[1]
+  const downloadName = filename || headerFilename || 'download'
+  const objectUrl = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = objectUrl
+  anchor.download = downloadName
+  anchor.style.display = 'none'
+  document.body.append(anchor)
+  anchor.click()
+  anchor.remove()
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0)
+
+  return { filename: downloadName, size: blob.size }
 }
