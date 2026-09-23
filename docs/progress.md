@@ -675,3 +675,69 @@ Status: Completed
 ### Next
 
 Await manual F6 verification before starting Frontend F7 — User Management.
+
+## Frontend F7 — User Management
+
+Status: Frontend completed; backend create-response sanitization remains pending approval.
+
+### Files Changed
+
+- `client/src/App.jsx`
+- `client/src/components/UserBadges.jsx`
+- `client/src/users/userApi.js`
+- `client/src/users/userUtils.js`
+- `client/src/pages/UsersPage.jsx`
+- `client/src/pages/UserFormPage.jsx`
+- `client/src/pages/UserPages.css`
+- `docs/progress.md`
+
+### Completed
+
+- Replaced the final User Management placeholders with Admin-only list, add, and edit screens connected to the existing User API.
+- Added user listing with backend-supported name/email search, role filtering, status filtering, pagination, loading skeleton, retry handling, filtered/no-data states, and success feedback.
+- Added consistent role badges for Admin, Procurement Manager, and Viewer plus active/inactive account status badges.
+- Added the Add User form with name, email, temporary password, and role fields; required-field, email-format, minimum-eight-character password, and role validation; duplicate-email field feedback; and no password logging or browser storage.
+- Added the Edit User form with existing values, name/role/status updates, immutable read-only email, loading/retry states, and list feedback after successful saves.
+- Added protected Admin account behavior: role and status controls are disabled for existing Admin accounts, with explicit explanations that they cannot be demoted or deactivated.
+- Added current-session refresh after editing the signed-in Admin's own name so the shared header remains current.
+- Preserved the existing Admin-only route guard and Admin-only sidebar navigation for list, add, and edit routes.
+- Removed the obsolete placeholder routing helper now that every F1–F7 screen has a production component.
+
+### Reference and Contract Findings
+
+- `GET /api/users` supports page, limit, search, role, and status. Search covers user name and email.
+- The backend has no `GET /api/users/:id` endpoint. Direct Edit User navigation therefore locates the requested user through paginated Admin list responses.
+- `POST /api/users` requires name, email, a password of at least eight characters, and one of the three defined roles; new accounts are always ACTIVE.
+- The backend checks email presence and uniqueness but does not validate email syntax. The frontend supplies the explicitly requested basic email-format validation before submission.
+- `PATCH /api/users/:id` supports name, role, and status only. Email and password updates are not part of the contract, so edit email is displayed read-only and no password field is shown.
+- Existing Admin accounts may change name but cannot be demoted or deactivated. The frontend locks those controls and the backend independently rejects prohibited payloads.
+- User Management screenshots do not show search/filter controls although the backend supports them and F7 requests them. Their layout is inferred from the established Supplier/Evaluation filter design.
+- `docs/api.md`, `docs/requirements.md`, and `docs/data-model.md` remain empty; the implemented routes, controllers, service validation, model, and existing progress history were used as the contract source.
+
+### Verified
+
+- `npm run lint` passes.
+- `npm run build` passes.
+- Client checks pass for required fields, invalid email format, password length, role validation, payload normalization, omission of email/password from edit payloads, protected-Admin detection, and duplicate-email field mapping.
+- Admin receives the paginated user list with name, email, role, and status, and `GET /api/users` does not include `passwordHash`.
+- Search, all three role filters, ACTIVE/INACTIVE status filters, invalid-filter rejection, and pagination across distinct records were verified through the live API.
+- Procurement Manager and Viewer each receive 403 for `GET /api/users`.
+- Missing-password and invalid-role creation requests return 400, and duplicate email returns 409 with no user created.
+- Existing Admin demotion and deactivation requests return 400; the Admin record remains ADMIN/ACTIVE afterward.
+- The database user count and existing account records were unchanged by F7 verification.
+- Direct unauthenticated browser navigation to `/users`, `/users/new`, and `/users/:id/edit` redirects to Login.
+
+### Outstanding Backend Issue
+
+- A newly created Mongoose `User` document serializes `passwordHash`, and `createUser` returns that document directly from `POST /api/users`. The list and edit responses are safe because their queries honor `select: false`, but a successful create response can expose the password hash in the browser network response.
+- No backend code was changed because the project rules require reporting and proposing the smallest safe fix first. The recommended fix is to sanitize the create response or add a `toJSON` transform that always removes `passwordHash`.
+
+### Not Verified
+
+- Successful user creation, profile/role/status updates, and deactivation were not executed because they would write to the shared database and no write approval was requested or granted. Validation and guaranteed-rejected safeguards were tested with a confirmed zero record-count change.
+- No INACTIVE account currently exists, so live inactive-session rejection could not be verified without changing existing data. The authentication middleware was inspected and rejects inactive accounts with 403.
+- Authenticated screenshot comparison, signed-in direct-route behavior, and live small-viewport checks could not be completed because the available browser session has no usable credentials. Backend authorization, sidebar conditions, route guards, and unauthenticated redirects were verified.
+
+### Next
+
+Await manual F7 verification and approval for the proposed backend response-sanitization fix. Do not start F8 yet.

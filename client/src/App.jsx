@@ -14,40 +14,16 @@ import KpisPage from './pages/KpisPage.jsx'
 import KpiWeightsPage from './pages/KpiWeightsPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
-import PlaceholderPage from './pages/PlaceholderPage.jsx'
 import ReportsPage from './pages/ReportsPage.jsx'
 import SupplierDetailsPage from './pages/SupplierDetailsPage.jsx'
 import SupplierFormPage from './pages/SupplierFormPage.jsx'
 import SuppliersPage from './pages/SuppliersPage.jsx'
+import UserFormPage from './pages/UserFormPage.jsx'
+import UsersPage from './pages/UsersPage.jsx'
 import { MANAGER_ROLES } from './suppliers/supplierUtils.js'
 import './App.css'
 
 const ADMIN = 'ADMIN'
-
-const pageDetails = {
-  suppliers: ['Suppliers', 'Manage your vendor records and performance history.'],
-  supplierNew: ['Add supplier', 'Keep contact and contract details in one place.'],
-  supplierDetails: ['Supplier details', 'Review supplier information and performance history.'],
-  supplierEdit: ['Edit supplier', 'Update supplier and contract details.'],
-  evaluations: ['Evaluations', 'Quarterly supplier assessments and their results.'],
-  evaluationNew: ['Evaluate supplier', 'Score each KPI from 1 to 5. Submitted results are read-only.'],
-  evaluationReview: ['Review evaluation', 'Check the assessment before final submission.'],
-  evaluationResult: ['Evaluation result', 'Submitted evaluation details are read-only.'],
-  compare: ['Compare suppliers', 'Compare two or three suppliers evaluated using the same criteria and weights.'],
-  reports: ['Reports', 'Filter evaluation records and export the selected results.'],
-  kpis: ['KPI Management', 'Manage the criteria used to assess supplier performance.'],
-  kpiNew: ['Add KPI', 'Define a criterion and its weight for future evaluations.'],
-  kpiEdit: ['Edit KPI', 'Update a criterion used for future evaluations.'],
-  kpiWeights: ['Adjust KPI weights', 'Set the shared criteria used for new evaluations.'],
-  users: ['User Management', 'Manage access to your supplier workspace.'],
-  userNew: ['Add user', 'Create an account and assign an access role.'],
-  userEdit: ['Edit user', 'Update account details and permissions.'],
-}
-
-function Page({ type }) {
-  const [title, description] = pageDetails[type]
-  return <PlaceholderPage title={title} description={description} />
-}
 
 function App() {
   return (
@@ -80,9 +56,9 @@ function App() {
                 <Route path="kpis/new" element={<KpiFormPage mode="create" />} />
                 <Route path="kpis/weights" element={<KpiWeightsPage />} />
                 <Route path="kpis/:kpiId/edit" element={<KpiFormPage mode="edit" />} />
-                <Route path="users" element={<Page type="users" />} />
-                <Route path="users/new" element={<Page type="userNew" />} />
-                <Route path="users/:userId/edit" element={<Page type="userEdit" />} />
+                <Route path="users" element={<UsersPage />} />
+                <Route path="users/new" element={<UserFormPage mode="create" />} />
+                <Route path="users/:userId/edit" element={<UserFormPage mode="edit" />} />
               </Route>
 
               <Route path="*" element={<NotFoundPage />} />
