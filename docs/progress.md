@@ -678,7 +678,7 @@ Await manual F6 verification before starting Frontend F7 — User Management.
 
 ## Frontend F7 — User Management
 
-Status: Frontend completed; backend create-response sanitization remains pending approval.
+Status: Completed
 
 ### Files Changed
 
@@ -727,10 +727,11 @@ Status: Frontend completed; backend create-response sanitization remains pending
 - The database user count and existing account records were unchanged by F7 verification.
 - Direct unauthenticated browser navigation to `/users`, `/users/new`, and `/users/:id/edit` redirects to Login.
 
-### Outstanding Backend Issue
+### Resolved Backend Security Issue
 
-- A newly created Mongoose `User` document serializes `passwordHash`, and `createUser` returns that document directly from `POST /api/users`. The list and edit responses are safe because their queries honor `select: false`, but a successful create response can expose the password hash in the browser network response.
-- No backend code was changed because the project rules require reporting and proposing the smallest safe fix first. The recommended fix is to sanitize the create response or add a `toJSON` transform that always removes `passwordHash`.
+- A newly created Mongoose `User` document previously serialized `passwordHash`, and `createUser` returns that document directly from `POST /api/users`.
+- After approval, a schema-level `toJSON` transform was added so create, list, and patch response documents consistently remove `passwordHash` during API serialization while retaining the stored field for authentication.
+- Query-level `select: false` remains in place, and the authentication flow still explicitly selects the hash only for password verification.
 
 ### Not Verified
 
@@ -740,4 +741,38 @@ Status: Frontend completed; backend create-response sanitization remains pending
 
 ### Next
 
-Await manual F7 verification and approval for the proposed backend response-sanitization fix. Do not start F8 yet.
+Await manual F7 verification. Do not start F8 yet.
+
+## F7 Security Follow-up — User Response Sanitization
+
+Status: Completed
+
+### Files Changed
+
+- `server/src/models/User.js`
+- `server/test/userSerialization.test.js`
+- `server/package.json`
+- `docs/progress.md`
+
+### Completed
+
+- Added a User schema `toJSON` transform that removes `passwordHash` from all serialized User documents.
+- Preserved `passwordHash` in the Mongoose document and MongoDB schema so login password verification remains unchanged.
+- Preserved the existing default query exclusion through `select: false`.
+- Added dependency-free Node regression tests for direct User serialization and the create, list, and patch API response shapes.
+- Added the server `npm test` script using Node's built-in test runner.
+
+### Verified
+
+- `npm test` passes 3/3 server regression tests.
+- Regression tests confirm the document retains its hash internally while `toJSON` and `JSON.stringify` omit both the `passwordHash` key and value.
+- Regression tests confirm representative `POST /api/users`, `GET /api/users`, and `PATCH /api/users/:id` response shapes never serialize `passwordHash`.
+- Regression tests confirm `passwordHash` remains `select: false` for User queries by default.
+- `node --check` passes for the User model, user controller, and user service.
+- Frontend `npm run lint` passes.
+- Frontend `npm run build` passes.
+- No database connection was opened and no user records were created or modified during this security fix.
+
+### Next
+
+Await manual F7 verification. Do not start F8 yet.
