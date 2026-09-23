@@ -3,6 +3,16 @@ import mongoose from "mongoose";
 import Supplier from "../models/Supplier.js";
 import { SUPPLIER_STATUS } from "../domain/constants.js";
 
+function optionalString(value) {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  const trimmed = String(value).trim();
+
+  return trimmed || undefined;
+}
+
 export async function createSupplier(data, createdBy) {
   const {
     supplierName,
@@ -52,17 +62,17 @@ export async function createSupplier(data, createdBy) {
 
   const supplier = await Supplier.create({
     supplierName: supplierName.trim(),
-    contactPerson,
-    email,
-    phone,
+    contactPerson: optionalString(contactPerson),
+    email: optionalString(email),
+    phone: optionalString(phone),
     category: category.trim(),
-    address,
-    taxId,
-    contractStart,
-    contractEnd,
+    address: optionalString(address),
+    taxId: optionalString(taxId),
+    contractStart: contractStart || undefined,
+    contractEnd: contractEnd || undefined,
     status: SUPPLIER_STATUS.ACTIVE,
     createdBy,
-  });
+});
 
   return supplier;
 }
@@ -167,11 +177,30 @@ export async function updateSupplier(id, data) {
     "contractEnd",
   ];
 
-  for (const field of allowedFields) {
-    if (data[field] !== undefined) {
-      supplier[field] = data[field];
-    }
+  const optionalStringFields = [
+  "contactPerson",
+  "email",
+  "phone",
+  "address",
+  "taxId",
+];
+
+for (const field of allowedFields) {
+  if (data[field] === undefined) {
+    continue;
   }
+
+  if (optionalStringFields.includes(field)) {
+    supplier[field] = optionalString(data[field]);
+  } else if (
+    field === "contractStart" ||
+    field === "contractEnd"
+  ) {
+    supplier[field] = data[field] || undefined;
+  } else {
+    supplier[field] = data[field];
+  }
+}
 
   if (!supplier.supplierName?.trim()) {
     const error = new Error("Supplier name is required");
@@ -195,6 +224,12 @@ export async function updateSupplier(id, data) {
     }
   }
 
+  supplier.supplierName =
+    supplier.supplierName.trim();
+
+  supplier.category =
+    supplier.category.trim();
+    
   await supplier.save();
 
   return supplier;

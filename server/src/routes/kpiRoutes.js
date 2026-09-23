@@ -22,28 +22,28 @@ router.get(
   getKpis
 );
 
-router.get(
-  "/:id",
-  allowRoles(USER_ROLES.ADMIN),
-  getKpi
-);
-
 router.post(
   "/",
   allowRoles(USER_ROLES.ADMIN),
   addKpi
 );
 
-router.patch(
-  "/:id",
-  allowRoles(USER_ROLES.ADMIN),
-  editKpi
-);
-
 router.put(
   "/weights",
   allowRoles(USER_ROLES.ADMIN),
   adjustKpiWeights
+);
+
+router.get(
+  "/:id",
+  allowRoles(USER_ROLES.ADMIN),
+  getKpi
+);
+
+router.patch(
+  "/:id",
+  allowRoles(USER_ROLES.ADMIN),
+  editKpi
 );
 
 export default router;

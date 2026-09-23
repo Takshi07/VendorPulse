@@ -312,3 +312,26 @@ Part 10 — Reports API and CSV export.
 ### Next
 
 Part 11 — Backend hardening and completion audit.
+
+## Part 11 — Backend Hardening
+
+### Completed
+
+- Normalized optional supplier fields, including blank tax IDs.
+- Added type validation for evaluation and KPI comments.
+- Placed the public health endpoint before protected routes.
+- Organized KPI routes with static routes before parameterized routes.
+- Reviewed backend routes and role permissions.
+
+### Verified
+
+- Backend starts and connects to MongoDB.
+- Public health endpoint returns 200.
+- All nine protected endpoints passed the regression checks.
+- Numeric evaluation comments return 400.
+- Invalid KPI weight updates return 400.
+- Git secret check completed.
+
+### Next
+
+Part 12 — React frontend foundation.

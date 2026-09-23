@@ -96,16 +96,25 @@ export async function createEvaluation(data, evaluatorId) {
     throw error;
   }
   if (
-    comments !== undefined &&
-    comments !== null &&
-    String(comments).length > 2000
+  comments !== undefined &&
+  comments !== null
   ) {
-    const error = new Error(
-        "Evaluation comments cannot exceed 2000 characters"
-    );
-    error.status = 400;
-    throw error;
-  }
+      if (typeof comments !== "string") {
+        const error = new Error(
+          "Evaluation comments must be text"
+        );
+        error.status = 400;
+        throw error;
+      }
+
+      if (comments.length > 2000) {
+        const error = new Error(
+          "Evaluation comments cannot exceed 2000 characters"
+        );
+        error.status = 400;
+        throw error;
+      }
+    }
 
   // Supplier must exist and be ACTIVE
     const supplier = await Supplier.findById(supplierId);
@@ -203,16 +212,25 @@ export async function createEvaluation(data, evaluatorId) {
     }
 
     if (
-        item.comment !== undefined &&
-        item.comment !== null &&
-        String(item.comment).length > 500
-    ) {
-        const error = new Error(
-        "KPI comment cannot exceed 500 characters"
-        );
-        error.status = 400;
-        throw error;
-    }
+  item.comment !== undefined &&
+  item.comment !== null
+) {
+  if (typeof item.comment !== "string") {
+    const error = new Error(
+      "KPI comment must be text"
+    );
+    error.status = 400;
+    throw error;
+  }
+
+  if (item.comment.length > 500) {
+    const error = new Error(
+      "KPI comment cannot exceed 500 characters"
+    );
+    error.status = 400;
+    throw error;
+  }
+}
 
     submittedIds.add(kpiId);
     }
