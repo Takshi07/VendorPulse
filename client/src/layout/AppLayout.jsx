@@ -139,7 +139,7 @@ export default function AppLayout() {
         {user.role === 'ADMIN' ? (
           <NavGroup label="Administration" items={adminNavigation} onNavigate={() => setSidebarOpen(false)} />
         ) : null}
-        <div className="sidebar-footer">VendorPulse / UI design</div>
+        <div className="sidebar-footer">VendorPulse</div>
       </aside>
 
       {sidebarOpen ? (

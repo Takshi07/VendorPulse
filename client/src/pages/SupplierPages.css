@@ -130,6 +130,11 @@
   box-shadow: none;
 }
 
+.supplier-history-card .state-panel > div {
+  display: grid;
+  justify-items: center;
+}
+
 .supplier-table-skeleton {
   display: grid;
   gap: 1px;
