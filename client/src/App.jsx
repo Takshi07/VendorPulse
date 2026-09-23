@@ -4,6 +4,9 @@ import { ProtectedRoute } from './auth/ProtectedRoute.jsx'
 import AppLayout from './layout/AppLayout.jsx'
 import AccessDeniedPage from './pages/AccessDeniedPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
+import KpiFormPage from './pages/KpiFormPage.jsx'
+import KpisPage from './pages/KpisPage.jsx'
+import KpiWeightsPage from './pages/KpiWeightsPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import PlaceholderPage from './pages/PlaceholderPage.jsx'
@@ -65,10 +68,10 @@ function App() {
               <Route path="access-denied" element={<AccessDeniedPage />} />
 
               <Route element={<ProtectedRoute allowedRoles={[ADMIN]} />}>
-                <Route path="kpis" element={<Page type="kpis" />} />
-                <Route path="kpis/new" element={<Page type="kpiNew" />} />
-                <Route path="kpis/weights" element={<Page type="kpiWeights" />} />
-                <Route path="kpis/:kpiId/edit" element={<Page type="kpiEdit" />} />
+                <Route path="kpis" element={<KpisPage />} />
+                <Route path="kpis/new" element={<KpiFormPage mode="create" />} />
+                <Route path="kpis/weights" element={<KpiWeightsPage />} />
+                <Route path="kpis/:kpiId/edit" element={<KpiFormPage mode="edit" />} />
                 <Route path="users" element={<Page type="users" />} />
                 <Route path="users/new" element={<Page type="userNew" />} />
                 <Route path="users/:userId/edit" element={<Page type="userEdit" />} />

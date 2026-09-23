@@ -483,3 +483,61 @@ Status: Completed
 ### Next
 
 Frontend F4 — Implement KPI Management and coordinated weights.
+
+## Frontend F4 — KPI Management
+
+Status: Completed
+
+### Files Changed
+
+- `client/src/App.jsx`
+- `client/src/kpis/kpiUtils.js`
+- `client/src/pages/KpisPage.jsx`
+- `client/src/pages/KpiFormPage.jsx`
+- `client/src/pages/KpiWeightsPage.jsx`
+- `client/src/pages/KpiPages.css`
+- `docs/progress.md`
+
+### Completed
+
+- Replaced all KPI placeholders with Admin-only production pages connected to the existing KPI API.
+- Added the live KPI list with criterion name, weight, status, edit links, loading skeleton, retry handling, and an empty state.
+- Added a live active-weight summary that clearly distinguishes a valid 100% evaluation configuration from an invalid total.
+- Added screenshot-aligned Add KPI and Edit KPI forms with name, optional description, weight, and ACTIVE/INACTIVE status controls.
+- Added client validation for required names and numeric weights greater than 0 and no more than 100, while retaining backend duplicate-name and validation messages.
+- Kept single-KPI edits independent; the frontend never silently redistributes other KPI weights.
+- Added an active-only coordinated weight editor that submits all displayed weights through `PUT /api/kpis/weights` and requires a live total of exactly 100%.
+- Added explicit future-evaluation and historical-snapshot messaging so the interface does not imply that existing evaluation results change.
+- Added loading, success, validation, API error, and no-active-KPI states using the existing application shell and design tokens.
+- Preserved the existing Admin route guard for all KPI list, add, edit, and weight routes.
+
+### Reference and Contract Findings
+
+- `GET /api/kpis` returns `{ kpis }` without an active total, so the frontend calculates the total from ACTIVE records.
+- Individual create/edit requests validate only the affected KPI and may leave the active total temporarily different from 100%; the frontend displays that condition rather than changing other records automatically.
+- `PUT /api/kpis/weights` accepts `{ updates: [{ id, weight }] }`, validates the resulting complete ACTIVE configuration, and returns `{ kpis, totalActiveWeight }`.
+- KPI activation and deactivation use the general `PATCH /api/kpis/:id` endpoint; there is no separate status endpoint or deletion route.
+- Historical evaluations retain embedded KPI name and weight snapshots and are not rewritten when current KPI definitions change.
+
+### Verified
+
+- `npm run lint` passes.
+- `npm run build` passes.
+- Client-side checks pass for required names, valid and invalid weight boundaries, payload normalization, and active-total calculation.
+- Admin can list, create, read, edit, activate, and deactivate a clearly named F4 test KPI.
+- Duplicate KPI names return 409 with the expected clear message, and a weight greater than 100 returns 400.
+- Procurement Manager and Viewer receive 403 for KPI list access; Viewer creation and Procurement Manager editing also return 403.
+- An invalid coordinated 101% update returns 400 and leaves every stored weight unchanged.
+- A valid coordinated 100% update succeeds through the weights endpoint.
+- The test KPI was returned to INACTIVE status. The pre-existing active KPI IDs, statuses, and weights match their pre-test values.
+- The final evaluation configuration is valid and the active KPI total is exactly 100%.
+- The retained test record is clearly identifiable and inactive (`6ab3c77b9b3ce3d89dd011b0`).
+- Browser verification confirms an unauthenticated direct `/kpis` URL redirects to Login without console errors.
+
+### Not Verified
+
+- Authenticated screenshot comparison and direct-URL redirects for logged-in Procurement Manager and Viewer accounts could not be exercised in the available browser because it had no authenticated session or usable credentials. Server-side 403 behavior was verified for both roles, and every KPI route remains inside the existing Admin-only `ProtectedRoute`.
+
+### Next
+
+Frontend F5 — Implement Evaluations.
