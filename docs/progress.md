@@ -335,3 +335,44 @@ Part 11 — Backend hardening and completion audit.
 ### Next
 
 Part 12 — React frontend foundation.
+
+## Frontend F1 — Foundation and Application Shell
+
+Status: Completed
+
+### Completed
+
+- Verified read access to the `VendorPulse`, `VendorPulse-UI`, and `FSD` workspaces without modifying the reference folders.
+- Visually reviewed all 19 supplied UI screens and mapped them to frontend routes.
+- Audited the implemented Express routes, service response shapes, model fields, role permissions, and error codes used by the frontend.
+- Added React Router and Lucide React while preserving the existing Vite setup and lockfile.
+- Added a centralized `/api` request helper with query serialization, JSON/error handling, and `credentials: "include"` for the HttpOnly session cookie.
+- Added authentication context with login, logout, and session restoration through `GET /api/auth/me`.
+- Added protected routes and Admin-only route guards.
+- Added the complete frontend route map for Dashboard, Suppliers, Evaluations, Compare, Reports, KPI Management, and User Management.
+- Added role-aware workspace and administration navigation.
+- Added the shared responsive header, sidebar, profile menu, logout flow, page container, and mobile navigation.
+- Added the supplied VendorPulse logo as a production client asset.
+- Added centralized visual tokens and reusable page header, button, form, status, loading, empty, and error-state styles/components.
+- Added a functional login screen matching the supplied design direction.
+- Added phase placeholders so unfinished feature routes remain explicit without mock application data.
+
+### Reference and Contract Findings
+
+- `docs/requirements.md`, `docs/api.md`, `docs/data-model.md`, and `docs/test-evidence.md` are currently empty; the backend implementation is the functional source of truth.
+- Supplier evaluation history requires combining `GET /api/suppliers/:id` with `GET /api/evaluations?supplierId=:id`.
+- The user edit endpoint does not support email changes, so the email displayed on the edit screen must be read-only.
+- Evaluation review is a client-side preview; the server remains authoritative when the evaluation is submitted.
+- Reporting period defaults must be derived by the client because the backend does not provide a current-period endpoint.
+
+### Verified
+
+- `npm run lint` passes.
+- `npm run build` passes.
+- The production build contains the React application and optimized VendorPulse logo asset.
+- Browser verification confirms the login layout renders correctly at desktop and 390px mobile widths without horizontal overflow.
+- Browser verification confirms empty login validation and unauthenticated protected-route redirects.
+
+### Next
+
+Frontend F2 — Implement the live Dashboard and complete its data, loading, empty, and error states.
