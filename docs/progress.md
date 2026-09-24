@@ -835,3 +835,77 @@ Status: Completed
 ### Next
 
 Await manual verification of this pre-F8 checkpoint. F8 has not started.
+
+## F8 — Final Integration, Regression, Security, and Release Readiness
+
+Status: Completed with explicit manual follow-up noted below
+
+All implementation phases F1 through F7 and the pre-F8 PDF/report polish remain complete. F8 did not start the separate clean-database/final-initialization stage.
+
+### Files Changed
+
+- `client/index.html`
+- `server/.env.example`
+- `server/test/authController.test.js`
+- `server/test/comparisonService.test.js`
+- `README.md`
+- `docs/api.md`
+- `docs/progress.md`
+
+### Fixes and Coverage Added
+
+- Corrected the browser title from the Vite scaffold value to `VendorPulse`.
+- Added focused comparison regression coverage for incompatible historical criteria, the two-or-three supplier rule, and duplicate supplier selection.
+- Added focused authentication controller coverage for successful password verification and cookie issuance, invalid credentials, inactive-account rejection, public-only user serialization, and logout cookie clearing.
+- Corrected the documented server port in `server/.env.example` from 5000 to the implemented port 5002.
+- Added a project README and expanded the API documentation to cover setup, roles, modules, authentication, authorization, immutable evaluation snapshots, criteria compatibility, CSV/PDF behavior, testing, and security boundaries.
+
+### Post-Rotation Authentication and Security Verification
+
+- The JWT signing secret was rotated by the project owner and the backend was restarted without disclosing or reading back the value.
+- No pre-rotation cookie remained available after the cookie-jar cleanup, so replay of the exact old session was not possible. A wrong-signature token and an expired token were each rejected with 401, as were malformed and missing sessions.
+- Newly signed live sessions using the restarted server configuration were accepted by `/api/auth/me` for active Admin, Procurement Manager, and Viewer accounts.
+- Logout cleared the session and a subsequent request without the cookie returned 401.
+- The login controller regression uses an in-memory bcrypt fixture to verify normal password authentication and HttpOnly cookie issuance without touching the database or exposing credentials.
+- The repository's reachable local history was sanitized before F8 resumed: `server/cookies.txt` is absent from rewritten local history, cookie jars and `.env` are ignored, and the reachable-history secret scan found no credible committed secret after remediation.
+- The remote `origin/main` still contains the pre-remediation history. No push or force-push was performed; remote history repair remains a separately approved security operation.
+
+### Automated and Live Verification
+
+- Server `npm test`: 16 tests passed, 0 failed.
+- Server syntax checks: all JavaScript files under `src` and `test` passed `node --check`.
+- Client `npm run lint`: passed with no errors.
+- Client `npm run build`: passed with Vite 8.3.0; 1,933 modules transformed.
+- Client and server `npm ls --depth=0`: passed; dependency trees are satisfied. PDFKit remains server-only and no temporary/debug dependency was added.
+- Public `GET /api/health`: 200. Unauthenticated `GET /api/auth/me`: 401. Exactly one process was listening on port 5002 during the final check.
+- The live integration harness passed authentication/session errors, the complete backend role matrix, suppliers, KPIs, evaluations and immutable snapshots, comparison, Dashboard/Reports/CSV/PDF consistency, User Management response sanitization, and database invariance.
+- Active KPI weights remained exactly 100 after verification.
+- Admin, Procurement Manager, and Viewer received only their permitted API access. Admin-only KPI/User endpoints and manager-only write/evaluation configuration endpoints rejected unauthorized roles.
+- Dashboard, evaluation history/result, comparison, report JSON, CSV, and PDF agreed on saved supplier, period, score, rating, and risk facts for the existing compatible evaluation pair.
+- Reports and both exports respected supplier/year/quarter filters. CSV retained its existing content type and semantics; PDF retained its management-report format, snapshot-based KPI content, criteria grouping, empty-report behavior, and role access.
+- Supplier, KPI, evaluation, report, comparison, and user validation/error contracts were exercised without creating valid permanent records. Invalid/malformed requests returned controlled 400/401/403/404/409 outcomes as applicable.
+- User create/list/patch serialization tests confirmed `passwordHash` is absent while the model retains it for authentication.
+- Multi-supplier, single-supplier, empty, and long-content PDFs were generated under the system temporary directory and inspected as rendered A4 pages. Page boundaries, wrapping, badges, charts, headers, footers, and page numbering were readable and no internal identifiers or session details were intentionally printed.
+- The browser title, signed-out protected-route redirect, login labels/required errors, invalid-login message, and responsive login layout were checked at desktop, tablet, and mobile widths. No horizontal overflow or browser console errors were observed on that signed-out flow.
+- The Dashboard Active suppliers card continues to use the same shared readable metric-card styling as Suppliers evaluated for every role; the responsive shared grid was unchanged.
+- Package locks remain present, generated build output remains ignored, and no `.env`, cookie jar, generated PDF/export, `node_modules`, or temporary debug artifact is tracked.
+
+### Database Safety
+
+- The final live harness compared database counts and the complete KPI configuration before and after and reported them unchanged.
+- No supplier, KPI, evaluation, or user was created, edited, archived, deleted, or reset during F8.
+- The development database was not reset, and no fresh/final database was created or configured.
+
+### Manual Follow-up / Non-blocking Limitations
+
+- The exact pre-rotation session cookie was unavailable, so it could not be replayed; wrong-signature and expired-session rejection provide the executable replacement check.
+- No valid account passwords are stored in the repository or environment, so fresh live credential login, authenticated browser refresh, already-authenticated login redirect, and full authenticated browser navigation require a short owner-run browser check. Password login behavior is covered by the new controller regression, and live post-rotation sessions were accepted for all roles.
+- The current development database has no inactive user, so live inactive-account login/session rejection was not exercised without an unauthorized data mutation; the controller and middleware paths were verified through automated coverage and source/integration checks.
+- The database has two, not three, compatible evaluations in a common period. Live comparison was verified with two suppliers; the three-supplier validation path is covered without manufacturing immutable data.
+- The live database has no same-period incompatible comparison pair. `INCOMPATIBLE_CRITERIA` behavior is covered by the new service regression fixture.
+- Full authenticated visual/responsive inspection of Dashboard, Suppliers, KPIs, Evaluations, Compare, Reports, and Users remains an owner browser pass because credentials were not exposed to the automated browser. The user previously manually verified F1 through F7 and the pre-F8 work.
+- The 10,000-row CSV and 500-evaluation PDF limits were not exercised against the small development dataset; the implemented limits and related code paths were reviewed without generating bulk records.
+
+### Release Readiness
+
+The sanitized local application branch is ready for the separately controlled clean-database/final-initialization stage after the remaining manual browser checks and the separately approved remote-history repair. Nothing was pushed during F8.
