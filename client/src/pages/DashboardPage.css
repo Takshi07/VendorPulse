@@ -88,12 +88,6 @@
   padding: 18px 20px;
 }
 
-.summary-card--featured {
-  color: var(--color-white);
-  background: var(--color-blue-700);
-  border-color: var(--color-blue-700);
-}
-
 .summary-card__top {
   display: flex;
   align-items: center;
@@ -104,10 +98,6 @@
   font-weight: 500;
 }
 
-.summary-card--featured .summary-card__top {
-  color: var(--color-white);
-}
-
 .summary-card strong {
   margin-top: 13px;
   color: var(--color-navy-900);
@@ -116,18 +106,10 @@
   line-height: 1;
 }
 
-.summary-card--featured strong {
-  color: var(--color-white);
-}
-
 .summary-card__caption {
   margin-top: auto;
   color: var(--color-muted);
   font-size: 12px;
-}
-
-.summary-card--featured .summary-card__caption {
-  color: #d6e4f2;
 }
 
 .dashboard-panel {

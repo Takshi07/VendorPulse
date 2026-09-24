@@ -3,6 +3,7 @@ import express from "express";
 import {
   getReport,
   exportReportCsv,
+  exportReportPdf,
 } from "../controllers/reportController.js";
 
 import { requireAuth } from "../middleware/auth.js";
@@ -26,6 +27,11 @@ router.get("/evaluations", getReport);
 router.get(
   "/evaluations.csv",
   exportReportCsv
+);
+
+router.get(
+  "/evaluations.pdf",
+  exportReportPdf
 );
 
 export default router;

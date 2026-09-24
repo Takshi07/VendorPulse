@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Download } from 'lucide-react'
+import { Download, FileText } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { api, ApiError } from '../api/client.js'
 import { useAuth } from '../auth/useAuth.js'
@@ -40,7 +40,7 @@ export default function ReportsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [requestVersion, setRequestVersion] = useState(0)
-  const [exporting, setExporting] = useState(false)
+  const [exporting, setExporting] = useState('')
   const [exportError, setExportError] = useState('')
   const [exportNotice, setExportNotice] = useState('')
 
@@ -96,13 +96,14 @@ export default function ReportsPage() {
   }
 
   async function exportCsv() {
-    setExporting(true)
+    setExporting('csv')
     setExportError('')
     setExportNotice('')
     try {
       const result = await api.download('/reports/evaluations.csv', {
         query: filters,
         filename: 'vendorpulse-evaluations.csv',
+        accept: 'text/csv',
       })
       setExportNotice(`${result.filename} downloaded using the active filters.`)
     } catch (requestError) {
@@ -114,7 +115,30 @@ export default function ReportsPage() {
         ? requestError.message
         : 'Unable to export the report. Check your connection and try again.')
     } finally {
-      setExporting(false)
+      setExporting('')
+    }
+  }
+
+  async function exportPdf() {
+    setExporting('pdf')
+    setExportError('')
+    setExportNotice('')
+    try {
+      const result = await api.download('/reports/evaluations.pdf', {
+        query: filters,
+        accept: 'application/pdf',
+      })
+      setExportNotice(`${result.filename} downloaded using the active filters.`)
+    } catch (requestError) {
+      if (requestError instanceof ApiError && requestError.status === 401) {
+        await restoreSession()
+        return
+      }
+      setExportError(requestError instanceof ApiError
+        ? requestError.message
+        : 'Unable to export the PDF report. Check your connection and try again.')
+    } finally {
+      setExporting('')
     }
   }
 
@@ -126,9 +150,14 @@ export default function ReportsPage() {
         title="Evaluation reports"
         description="Filter submitted evaluation records and export the selected results."
         actions={(
-          <button className="button button--primary" type="button" onClick={exportCsv} disabled={exporting || !data}>
-            <Download aria-hidden="true" /> {exporting ? 'Exporting…' : 'Export CSV'}
-          </button>
+          <div className="report-export-actions">
+            <button className="button button--secondary" type="button" onClick={exportCsv} disabled={Boolean(exporting) || !data}>
+              <Download aria-hidden="true" /> {exporting === 'csv' ? 'Exporting…' : 'Export CSV'}
+            </button>
+            <button className="button button--primary" type="button" onClick={exportPdf} disabled={Boolean(exporting) || !data}>
+              <FileText aria-hidden="true" /> {exporting === 'pdf' ? 'Generating…' : 'Export PDF'}
+            </button>
+          </div>
         )}
       />
 

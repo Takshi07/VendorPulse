@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
 import Evaluation from "../models/Evaluation.js";
+import Supplier from "../models/Supplier.js";
+
+const PDF_EXPORT_LIMIT = 500;
 
 function createError(message, status) {
   const error = new Error(message);
@@ -7,7 +10,7 @@ function createError(message, status) {
   return error;
 }
 
-function buildReportFilter({
+export function buildReportFilter({
   supplierId,
   year,
   quarter,
@@ -189,4 +192,63 @@ export async function getEvaluationReportCsv({
       row.map(escapeCsv).join(",")
     )
     .join("\n");
+}
+
+export async function getEvaluationReportPdfData({
+  supplierId,
+  year,
+  quarter,
+} = {}) {
+  const filter = buildReportFilter({
+    supplierId,
+    year,
+    quarter,
+  });
+
+  const total = await Evaluation.countDocuments(
+    filter
+  );
+
+  if (total > PDF_EXPORT_LIMIT) {
+    throw createError(
+      `PDF report contains more than ${PDF_EXPORT_LIMIT} evaluations. Apply narrower filters before exporting.`,
+      400
+    );
+  }
+
+  const [evaluations, selectedSupplier] =
+    await Promise.all([
+      Evaluation.find(filter)
+        .populate(
+          "supplierId",
+          "supplierName status category"
+        )
+        .populate(
+          "evaluatorId",
+          "name"
+        )
+        .sort({ createdAt: -1 })
+        .lean(),
+      supplierId
+        ? Supplier.findById(supplierId)
+            .select("supplierName")
+            .lean()
+        : null,
+    ]);
+
+  return {
+    evaluations,
+    scope: {
+      supplierName:
+        selectedSupplier?.supplierName ?? null,
+      year:
+        year === undefined || year === ""
+          ? null
+          : Number(year),
+      quarter:
+        quarter === undefined || quarter === ""
+          ? null
+          : Number(quarter),
+    },
+  };
 }

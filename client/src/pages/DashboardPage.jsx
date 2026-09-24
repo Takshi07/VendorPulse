@@ -41,9 +41,9 @@ function periodLabel({ year, quarter }) {
   return `Q${quarter} ${year}`
 }
 
-function SummaryCard({ featured = false, label, value, caption }) {
+function SummaryCard({ label, value, caption }) {
   return (
-    <section className={`summary-card surface${featured ? ' summary-card--featured' : ''}`}>
+    <section className="summary-card surface">
       <div className="summary-card__top">
         <span>{label}</span>
       </div>
@@ -159,7 +159,6 @@ export default function DashboardPage() {
 
           <div className="summary-grid">
             <SummaryCard
-              featured
               label="Active suppliers"
               value={dashboard.metrics.activeSupplierCount}
               caption="Current supplier records"

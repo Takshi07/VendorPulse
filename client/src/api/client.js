@@ -81,10 +81,14 @@ export function getApiUrl(path, query) {
   return `${API_ROOT}${path}${toQueryString(query)}`
 }
 
-async function downloadApiFile(path, { query, filename } = {}) {
+async function downloadApiFile(path, {
+  query,
+  filename,
+  accept = 'application/octet-stream',
+} = {}) {
   const response = await fetch(getApiUrl(path, query), {
     credentials: 'include',
-    headers: { Accept: 'text/csv' },
+    headers: { Accept: accept },
   })
 
   if (!response.ok) {
