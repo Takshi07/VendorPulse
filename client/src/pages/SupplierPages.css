@@ -130,6 +130,7 @@
   box-shadow: none;
 }
 
+.supplier-list-card .state-panel--empty > div,
 .supplier-history-card .state-panel > div {
   display: grid;
   justify-items: center;

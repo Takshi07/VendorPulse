@@ -13,7 +13,7 @@ export function LoadingState({ label = 'Loading…' }) {
 
 export function EmptyState({ title = 'Nothing here yet', message }) {
   return (
-    <div className="state-panel surface">
+    <div className="state-panel state-panel--empty surface">
       <div>
         <Inbox className="state-panel__icon" aria-hidden="true" />
         <h2>{title}</h2>

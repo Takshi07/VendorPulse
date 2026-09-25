@@ -185,6 +185,11 @@
   box-shadow: none;
 }
 
+.recent-panel .state-panel--empty > div {
+  display: grid;
+  justify-items: center;
+}
+
 .table-scroll {
   overflow-x: auto;
 }
