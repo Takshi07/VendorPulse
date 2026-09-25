@@ -909,3 +909,71 @@ All implementation phases F1 through F7 and the pre-F8 PDF/report polish remain 
 ### Release Readiness
 
 The sanitized local application branch is ready for the separately controlled clean-database/final-initialization stage after the remaining manual browser checks and the separately approved remote-history repair. Nothing was pushed during F8.
+
+## Final Database Initialization
+
+Status: Completed
+
+### Inspection Findings
+
+- A read-only connection metadata check confirmed that the existing development URI has no explicit database path and currently resolves to the MongoDB default database named `test`.
+- VendorPulse has four application models/collections: users, suppliers, KPIs, and evaluations.
+- The existing `createInitialAdmin.js` script only created one Admin. It had no whole-database safety check, did not create the baseline KPIs, was not exposed as an npm script, and logged Admin identifiers.
+- The repository already used `INITIAL_ADMIN_NAME`, `INITIAL_ADMIN_EMAIL`, and `INITIAL_ADMIN_PASSWORD` in that legacy script, but the variables were not documented in `.env.example`.
+- Runtime business logic does not hard-code default KPIs. Project progress documentation repeatedly identifies Quality 45%, Delivery 30%, and Cost 25% as the intended/restored baseline configuration, totaling exactly 100%.
+- The proposed final target is a new explicit database named `vendorpulse` on the existing cluster. The current `test` development database remains untouched.
+
+### Safe Initializer Implemented
+
+- Replaced the narrow legacy Admin script with explicit `npm run db:init` initialization. Normal `npm start` and `npm run dev` do not invoke it.
+- Requires an explicit database name in `MONGODB_URI`; a URI relying on MongoDB's default database is rejected before connection.
+- Requires privately configured initial Admin name, email, and password values. Credentials, hashes, JWT values, and connection details are never logged.
+- Accepts only a completely empty application database or the exact approved baseline. Exact-baseline reruns are no-ops; partial, different, or populated application states abort without changes.
+- Creates exactly one active Admin and three active KPIs: Quality 45%, Delivery 30%, and Cost 25%.
+- Never creates suppliers or evaluations and contains no drop, delete, reset, or overwrite operation.
+- Uses a transaction and verifies the final record counts/configuration before commit, preventing a failed KPI step from leaving a partial Admin-only database.
+- Disables Mongoose automatic collection/index creation during initializer preflight so an unexpected target receives no incidental schema writes before rejection.
+- Reuses one shared bcrypt hashing helper for regular User creation and initialization while preserving the existing 12-round hashing behavior.
+
+### Isolated Verification
+
+- The initializer tests use an in-memory transactional repository fixture and never connect to MongoDB.
+- Verified empty initialization, exactly one Admin, bcrypt password hashing, `passwordHash` serialization protection, exact baseline KPIs, 100% active weight, zero suppliers, and zero evaluations.
+- Verified idempotent reruns, unexpected/partial database rejection, duplicate/missing KPI protection, invalid Admin hash rejection, rollback after simulated KPI persistence failure, required bootstrap validation, and explicit database-name validation.
+- Full backend test suite passes: 22 tests, 0 failures.
+- All server source and test files pass `node --check`.
+- No Atlas database was initialized, reset, or otherwise modified during this preparation stage.
+
+### Live Initialization and Compatibility Fix
+
+- The owner approved `vendorpulse` and securely configured the explicit database path and initial Admin environment values without exposing them.
+- Initial attempts failed safely and transaction rollback left `vendorpulse` at zero records. Safe error-location diagnostics identified that Mongoose requires `ordered: true` when creating multiple documents with a session.
+- Added the required ordered transactional KPI creation option and retained sequential transaction reads. The temporary stack-location diagnostic was removed.
+- The successful initializer run created exactly one active Admin, three active KPIs, zero suppliers, and zero evaluations.
+- An immediate second initializer run recognized the exact approved baseline and completed as an idempotent no-op.
+- Independent read-only verification confirmed Quality 45%, Delivery 30%, and Cost 25% are active, share the Admin creator, and total exactly 100%.
+
+### Clean-Database Regression
+
+- Restarted the backend with the final `vendorpulse` configuration; exactly one process listens on port 5002 and `GET /api/health` returns 200.
+- Authenticated successfully as the initial Admin without logging credentials or the session cookie; `/api/auth/me` returned the active Admin session and no password hash.
+- Dashboard returns zero active suppliers, zero evaluated suppliers, zero high/critical risk, zero-preserving rating categories, and no recent evaluations.
+- Suppliers and evaluation history return paginated empty states.
+- KPI Management returns only the three approved active KPIs totaling 100%.
+- Evaluation configuration is valid, has a criteria signature and the baseline KPIs, and contains no eligible suppliers.
+- Compare returns the controlled insufficient-supplier validation response rather than failing unexpectedly.
+- Reports return an empty result set. CSV returns its valid header-only export, and PDF returns the designed valid empty report.
+- User Management returns exactly the single active Admin and never serializes `passwordHash`.
+- Logout succeeds and the subsequent session check returns 401.
+- No dummy suppliers, evaluations, Procurement Managers, or Viewers were created.
+
+### Development Database Preservation
+
+- The old `test` database remains untouched with the same observed snapshot before and after clean-database regression: 4 users, 5 KPIs, 6 suppliers, and 4 evaluations.
+- The old database was not dropped, cleared, renamed, or migrated.
+
+### Final State
+
+- `vendorpulse`: 1 user, 3 KPIs, 0 suppliers, 0 evaluations.
+- `test`: retained as the development-data fallback pending a separate owner decision.
+- Real environment values remain untracked and were not printed, staged, or committed.

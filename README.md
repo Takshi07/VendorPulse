@@ -29,8 +29,9 @@ Requirements: a supported Node.js installation and access to a MongoDB database.
 1. Install server dependencies with `npm install` from `server`.
 2. Install client dependencies with `npm install` from `client`.
 3. Copy `server/.env.example` to `server/.env` and set the private values locally.
-4. Start the API with `npm run dev` from `server`.
-5. Start Vite with `npm run dev` from `client`.
+4. For a brand-new database only, review and run the explicit initialization command described below.
+5. Start the API with `npm run dev` from `server`.
+6. Start Vite with `npm run dev` from `client`.
 
 The API listens on port 5002. Vite listens on port 5173 and proxies relative `/api` requests to the API.
 
@@ -41,9 +42,30 @@ PORT=5002
 NODE_ENV=development
 MONGODB_URI=
 JWT_SECRET=
+INITIAL_ADMIN_NAME=
+INITIAL_ADMIN_EMAIL=
+INITIAL_ADMIN_PASSWORD=
 ```
 
-Use private deployment-specific values for `MONGODB_URI` and `JWT_SECRET`. Never commit `server/.env` or credentials.
+Use private deployment-specific values for `MONGODB_URI`, `JWT_SECRET`, and the initial Admin credentials. Never commit `server/.env` or credentials. For initialization, `MONGODB_URI` must include one explicit database name rather than relying on MongoDB's default database.
+
+## Fresh database initialization
+
+Database initialization is an explicit one-time operation and is never run by normal server startup:
+
+```bash
+cd server
+npm run db:init
+```
+
+Before running it, configure `INITIAL_ADMIN_NAME`, `INITIAL_ADMIN_EMAIL`, and `INITIAL_ADMIN_PASSWORD` privately. The initializer validates the target before writing and permits only:
+
+- A completely empty VendorPulse database, which receives one active Admin plus Quality 45%, Delivery 30%, and Cost 25% as active KPIs.
+- The exact same approved baseline, in which case rerunning is a no-op.
+
+It aborts on partial or unexpected application data and never drops collections, deletes records, creates suppliers, or creates evaluations. Creation is transactional so a failed KPI step cannot leave a partial Admin-only installation. Bootstrap credentials are used only for initial creation; rerunning does not rotate an existing Admin password.
+
+After successful initialization, start the API normally and sign in with the privately configured initial Admin credentials. Additional users and all suppliers are then created through the authenticated application.
 
 ## Application behavior
 

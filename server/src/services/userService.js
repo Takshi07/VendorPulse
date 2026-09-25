@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
 
 import User from "../models/User.js";
+import { hashPassword } from "../domain/passwords.js";
 import {
   USER_ROLES,
   USER_STATUS,
@@ -110,7 +110,7 @@ export async function createUser(data) {
     throw createError("Invalid user role", 400);
   }
 
-  const passwordHash = await bcrypt.hash(password, 12);
+  const passwordHash = await hashPassword(password);
 
   const user = await User.create({
     name: name.trim(),
