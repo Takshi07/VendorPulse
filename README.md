@@ -1,6 +1,6 @@
 # VendorPulse
 
-VendorPulse is a Level 3 MERN supplier performance management system. It provides authenticated, role-aware workflows for suppliers, KPIs, quarterly evaluations, comparison, reporting, CSV/PDF exports, and user administration.
+VendorPulse is a MERN supplier performance management system. It provides authenticated, role-aware workflows for suppliers, KPIs, quarterly evaluations, comparison, reporting, CSV/PDF exports, and user administration.
 
 ## Stack
 
