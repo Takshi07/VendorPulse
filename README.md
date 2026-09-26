@@ -45,6 +45,8 @@ JWT_SECRET=
 INITIAL_ADMIN_NAME=
 INITIAL_ADMIN_EMAIL=
 INITIAL_ADMIN_PASSWORD=
+DEMO_MANAGER_PASSWORD=
+DEMO_VIEWER_PASSWORD=
 ```
 
 Use private deployment-specific values for `MONGODB_URI`, `JWT_SECRET`, and the initial Admin credentials. Never commit `server/.env` or credentials. For initialization, `MONGODB_URI` must include one explicit database name rather than relying on MongoDB's default database.
@@ -66,6 +68,26 @@ Before running it, configure `INITIAL_ADMIN_NAME`, `INITIAL_ADMIN_EMAIL`, and `I
 It aborts on partial or unexpected application data and never drops collections, deletes records, creates suppliers, or creates evaluations. Creation is transactional so a failed KPI step cannot leave a partial Admin-only installation. Bootstrap credentials are used only for initial creation; rerunning does not rotate an existing Admin password.
 
 After successful initialization, start the API normally and sign in with the privately configured initial Admin credentials. Additional users and all suppliers are then created through the authenticated application.
+
+## Optional demo dataset
+
+The professional review dataset is a separate, explicit operation and is never
+run by `npm start`, `npm run dev`, or `npm run db:init`. It accepts only an exact
+`vendorpulse` baseline (one active Admin, the 45/30/25 KPI configuration, and no
+supplier or evaluation records) or the exact completed demo dataset.
+
+Set `DEMO_MANAGER_PASSWORD` and `DEMO_VIEWER_PASSWORD` privately, review the
+records in `server/src/services/demoDataService.js`, then run:
+
+```bash
+cd server
+npm run db:seed-demo
+```
+
+The operation preserves the initial Admin, runs in a transaction, aborts on
+partial or unexpected data, and is an idempotent no-op when the approved demo
+dataset already exists. It refuses `test` and every database name other than
+the exact name `vendorpulse`.
 
 ## Application behavior
 
